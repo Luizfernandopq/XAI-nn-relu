@@ -1,4 +1,4 @@
-import docplex.mp.model as mp
+from docplex.mp.model import Model
 from cplex import infinity
 import numpy as np
 import tensorflow as tf
@@ -18,7 +18,7 @@ class NN_milp:
         self.output_variables = None
 
     def codify_milp_network(self):
-        self.milp_repr = mp.Model()
+        self.milp_repr = Model()
         self.get_domain_and_bounds_inputs()
 
         self.get_input_variables()
@@ -42,19 +42,19 @@ class NN_milp:
                 self.input_variables.append(self.milp_repr.binary_var(name=name))
 
     def get_intermediate_variables(self):
-        for i in range(len(self.network.layers) - 1):
-            weights = self.network.layers[i].get_weights()[0]
+        for idx_layer in range(len(self.network.layers) - 1):
+            len_neurons = self.network.layers[idx_layer].get_weights()[0].shape[1]
 
-            self.intermediate_variables.append(
-                self.milp_repr.continuous_var_list(weights.shape[1], lb=0, name='y', key_format=f"_{i}_%s"))
+            self.intermediate_variables.append(self.milp_repr.continuous_var_list(len_neurons,
+                                                                                  lb=0,
+                                                                                  name='y',
+                                                                                  key_format=f"_{idx_layer}_%s"))
 
-            self.decision_variables.append(
-                self.milp_repr.binary_var_list(weights.shape[1],
-                                               name='a',
-                                               lb=0,
-                                               ub=1,
-                                               key_format=f"_{i}_%s")
-            )
+            self.decision_variables.append(self.milp_repr.binary_var_list(len_neurons,
+                                                                          name='a',
+                                                                          lb=0,
+                                                                          ub=1,
+                                                                          key_format=f"_{idx_layer}_%s"))
 
     def get_domain_and_bounds_inputs(self):
         columns = self.dataframe.columns

@@ -1,4 +1,5 @@
 from src.XAI.NN_milp import NN_milp
+import numpy as np
 
 
 class NN_milp_tjeng(NN_milp):
@@ -22,7 +23,6 @@ class NN_milp_tjeng(NN_milp):
                 y = self.output_variables
 
             for j in range(A.shape[0]):
-
                 weighted_sum = A[j, :] @ x + b[j]
                 ub = self.maximize(weighted_sum)
 
@@ -43,6 +43,8 @@ class NN_milp_tjeng(NN_milp):
                 else:
                     self.milp_repr.add_constraint(weighted_sum == y[j])
                     self.output_bounds.append([lb, ub])
+
+        return self.output_bounds
 
     def maximize(self, expr):
         self.milp_repr.maximize(expr)
