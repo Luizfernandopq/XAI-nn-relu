@@ -10,5 +10,5 @@ class eXplanator:
                 self.milp = NN_milp_tjeng(network, dataframe)
                 self.milp.codify_milp_network()
 
-    def explain(self, network_input, network_output):
+    def get_minimal_explanation(self, network_input, network_output):
         pass

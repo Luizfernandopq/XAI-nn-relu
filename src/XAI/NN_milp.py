@@ -3,10 +3,6 @@ from cplex import infinity
 import numpy as np
 import tensorflow as tf
 import pandas as pd
-from main_code.rede_em_milp import slice_bounds as sb
-
-from main_code.rede_em_milp import tjeng
-from main_code.rede_em_milp import fischetti
 
 
 class NN_milp:
@@ -14,8 +10,8 @@ class NN_milp:
         self.network = network
         self.dataframe = dataframe
         self.milp_repr = None
-        self.type_domain_input = None
-        self.bounds_input = None
+        self.type_domain_input = []
+        self.bounds_input = []
         self.input_variables = []
         self.intermediate_variables = []
         self.decision_variables = []
@@ -27,6 +23,25 @@ class NN_milp:
 
         self.get_input_variables()
 
+        self.get_intermediate_variables()
+
+        self.output_variables = self.milp_repr.continuous_var_list(self.network.layers[-1].get_weights()[0].shape[1],
+                                                                   lb=-infinity,
+                                                                   name='o'
+                                                                   )
+
+    def get_input_variables(self):
+        for index, (domain, bounds) in enumerate(zip(self.type_domain_input, self.bounds_input)):
+            lower_bound, upper_bound = bounds
+            name = f'x_{index}'
+            if domain == 'C':
+                self.input_variables.append(self.milp_repr.continuous_var(lb=lower_bound, ub=upper_bound, name=name))
+            elif domain == 'I':
+                self.input_variables.append(self.milp_repr.integer_var(lb=lower_bound, ub=upper_bound, name=name))
+            else:
+                self.input_variables.append(self.milp_repr.binary_var(name=name))
+
+    def get_intermediate_variables(self):
         for i in range(len(self.network.layers) - 1):
             weights = self.network.layers[i].get_weights()[0]
 
@@ -41,19 +56,15 @@ class NN_milp:
                                                key_format=f"_{i}_%s")
             )
 
-        self.output_variables = self.milp_repr.continuous_var_list(self.network.layers[-1].get_weights()[0].shape[1],
-                                                                   lb=-infinity,
-                                                                   name='o'
-                                                                   )
-
-
-
-
-    def get_input_variables(self):
-        pass
-
     def get_domain_and_bounds_inputs(self):
-        pass
+        columns = self.dataframe.columns
+        for column in columns:
+            unique_values = self.dataframe[column].unique()
+            self.type_domain_input.append(
+                'B' if len(unique_values) == 2 else
+                'C' if np.any(unique_values.astype(np.int64) != unique_values.astype(np.float64)) else
+                'I')
+            self.bounds_input.append((self.dataframe[column].min(), self.dataframe[column].max()))
 
-    def insert_output_constraints(self, network_output_argmax):
+    def insert_output_constraints(self, index_output_predicted, binary_variables):
         pass
