@@ -23,7 +23,7 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
 
         for j in range(A.shape[0]):
 
-            mdl._maximize(A[j, :] @ x + b[j])
+            mdl.maximize(A[j, :] @ x + b[j])
             mdl.solve()
             ub = mdl.solution.get_objective_value()
             mdl.remove_objective()
@@ -32,7 +32,7 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
                 mdl.add_constraint(y[j] == 0, ctname=f'c_{i}_{j}')
                 continue
 
-            mdl._minimize(A[j, :] @ x + b[j])
+            mdl.minimize(A[j, :] @ x + b[j])
             mdl.solve()
             lb = mdl.solution.get_objective_value()
             mdl.remove_objective()
