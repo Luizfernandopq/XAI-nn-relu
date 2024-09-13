@@ -1,8 +1,7 @@
 import numpy as np
 from cplex import infinity
 
-from docplex.mp.model import Model
-
+import docplex.mp.model as mp
 
 class Codificator:
 
@@ -23,7 +22,7 @@ class Codificator:
         self.bounds_large = []
         self.bounds_large.append(self.get_types_and_bounds())
 
-        self.milp_represetation = Model()
+        self.milp_represetation = mp.Model()
 
         self._init_input_variables()
 
@@ -62,9 +61,14 @@ class Codificator:
                 lb = self._minimize(weighted_sum)
 
                 if i != len_layers - 1:
-                    self.milp_represetation.add_constraint(y[j] <= weighted_sum - lb * (1 - a[j]))
-                    self.milp_represetation.add_constraint(y[j] >= weighted_sum)
-                    self.milp_represetation.add_constraint(y[j] <= ub * a[j])
+                    if ub <= 0:
+                        self.milp_represetation.add_constraint(y[j] == 0, ctname=f'c_{i}_{j}')
+                    elif lb >= 0:
+                        self.milp_represetation.add_constraint(A[j, :] @ x + b[j] == y[j], ctname=f'c_{i}_{j}')
+                    else:
+                        self.milp_represetation.add_constraint(y[j] <= weighted_sum - lb * (1 - a[j]))
+                        self.milp_represetation.add_constraint(y[j] >= weighted_sum)
+                        self.milp_represetation.add_constraint(y[j] <= ub * a[j])
 
                     bounds.append((lb, ub))
 
@@ -108,7 +112,7 @@ class Codificator:
             len_neurons = self.network.layers[idx_layer].weight.detach().numpy().T.shape[1]
 
             self.intermediate_variables.append(self.milp_represetation.continuous_var_list(len_neurons,
-                                                                                  lb=0, # -infinity PARA OBTER MAIORES BOUNDS
+                                                                                  lb=0,
                                                                                   name='y',
                                                                                   key_format=f"_{idx_layer}_%s"))
 

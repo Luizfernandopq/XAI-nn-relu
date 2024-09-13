@@ -14,9 +14,10 @@ class Explanator:
         self.input_tensors = input_tensors
         dataframe.drop(columns='target', inplace=True)
         self.codificator = Codificator(network, dataframe)
+        self.codificator.codify_network_milp_large_bounds()
+
 
     def back_explication(self, instance_index):
-        self.codificator.codify_network_milp_large_bounds()
 
         bounds = deque()
 

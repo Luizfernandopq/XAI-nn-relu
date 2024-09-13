@@ -28,23 +28,28 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
             ub = mdl.solution.get_objective_value()
             mdl.remove_objective()
 
-            if ub <= 0 and i != len(layers) - 1:
-                mdl.add_constraint(y[j] == 0, ctname=f'c_{i}_{j}')
-                continue
+            # if ub <= 0 and i != len(layers) - 1:
+            #      mdl.add_constraint(y[j] == 0, ctname=f'c_{i}_{j}')
+            #      continue
 
             mdl.minimize(A[j, :] @ x + b[j])
             mdl.solve()
             lb = mdl.solution.get_objective_value()
             mdl.remove_objective()
 
-            if lb >= 0 and i != len(layers) - 1:
-                mdl.add_constraint(A[j, :] @ x + b[j] == y[j], ctname=f'c_{i}_{j}')
-                continue
+            # if lb >= 0 and i != len(layers) - 1:
+            #     mdl.add_constraint(A[j, :] @ x + b[j] == y[j], ctname=f'c_{i}_{j}')
+            #     continue
 
             if i != len(layers) - 1:
-                mdl.add_constraint(y[j] <= A[j, :] @ x + b[j] - lb * (1 - a[j]))
-                mdl.add_constraint(y[j] >= A[j, :] @ x + b[j])
-                mdl.add_constraint(y[j] <= ub * a[j])
+                if ub <= 0:
+                    mdl.add_constraint(y[j] == 0, ctname=f'c_{i}_{j}')
+                elif lb >= 0:
+                    mdl.add_constraint(A[j, :] @ x + b[j] == y[j], ctname=f'c_{i}_{j}')
+                else:
+                    mdl.add_constraint(y[j] <= A[j, :] @ x + b[j] - lb * (1 - a[j]))
+                    mdl.add_constraint(y[j] >= A[j, :] @ x + b[j])
+                    mdl.add_constraint(y[j] <= ub * a[j])
 
                 #mdl.maximize(y[j])
                 #mdl.solve()
@@ -67,14 +72,18 @@ def codify_network(model, dataframe):
     # num_features = layers[0].get_weights()[0].shape[0]
     mdl = mp.Model()
 
-    _, bounds_input = get_domain_and_bounds_inputs(dataframe)
+    domain_input, bounds_input = get_domain_and_bounds_inputs(dataframe)
     bounds_input = np.array(bounds_input)
 
     input_variables = []
-    for i in range(num_features):
+    for i in range(len(domain_input)):
         lb, ub = bounds_input[i]
-        input_variables.append(mdl.continuous_var(lb=lb, ub=ub, name=f'x_{i}'))
-    print(input_variables)
+        if domain_input[i] == 'C':
+            input_variables.append(mdl.continuous_var(lb=lb, ub=ub, name=f'x_{i}'))
+        elif domain_input[i] == 'I':
+            input_variables.append(mdl.integer_var(lb=lb, ub=ub, name=f'x_{i}'))
+        elif domain_input[i] == 'B':
+            input_variables.append(mdl.binary_var(name=f'x_{i}'))
     intermediate_variables = []
     auxiliary_variables = []
     decision_variables = []
@@ -83,13 +92,11 @@ def codify_network(model, dataframe):
         # weights = layers[i].get_weights()[0]
         weights = layers[i].weight.detach().numpy().T
         intermediate_variables.append(mdl.continuous_var_list(weights.shape[1], lb=0, name='y', key_format=f"_{i}_%s"))
-        print(intermediate_variables)
 
         decision_variables.append(mdl.binary_var_list(weights.shape[1], name='a', lb=0, ub=1, key_format=f"_{i}_%s"))
 
     # output_variables = mdl.continuous_var_list(layers[-1].get_weights()[0].shape[1], lb=-infinity, name='o')
     output_variables = mdl.continuous_var_list(layers[-1].weight.detach().numpy().T.shape[1], lb=-infinity, name='o')
-    print(output_variables)
 
     mdl, output_bounds = codify_network_tjeng(mdl, layers, input_variables,
                                                   intermediate_variables, decision_variables, output_variables)
