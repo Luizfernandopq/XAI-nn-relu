@@ -6,10 +6,16 @@ import docplex.mp.model as mp
 class Codificator:
 
     def __init__(self, network, dataframe):
+
+        # Objetos: NeuralNetwork, DataFrame, mp.Model
         self.network = network
         self.dataframe = dataframe
         self.milp_represetation = None
 
+        # Input types é uma lista de string
+        # Bounds large é uma lista de lista de tuplas, [(x1_min, x1_max) ...][(y1_1_min, y1_1_max)...]...
+        # Lista contém várias listas em que cada lista é uma camada e cada item dessa lista é um neurônio e a
+        # tupla é o min max dos bounds do neurônio
         self.input_types = None
         self.bounds_large = None
 
@@ -63,8 +69,9 @@ class Codificator:
                 if i != len_layers - 1:
                     if ub <= 0:
                         self.milp_represetation.add_constraint(y[j] == 0, ctname=f'c_{i}_{j}')
+                        ub = 0
                     elif lb >= 0:
-                        self.milp_represetation.add_constraint(A[j, :] @ x + b[j] == y[j], ctname=f'c_{i}_{j}')
+                        self.milp_represetation.add_constraint(weighted_sum == y[j], ctname=f'c_{i}_{j}')
                     else:
                         self.milp_represetation.add_constraint(y[j] <= weighted_sum - lb * (1 - a[j]))
                         self.milp_represetation.add_constraint(y[j] >= weighted_sum)
