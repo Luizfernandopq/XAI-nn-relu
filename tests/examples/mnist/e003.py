@@ -17,7 +17,7 @@ def run():
     # Configurações
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # device = torch.device('cpu')
-    # print(f"Rodando em: {device}")
+    print(f"Rodando em: {device}")
 
     # Dataset e DataLoader
     transform = transforms.Compose([transforms.ToTensor()])
@@ -26,7 +26,6 @@ def run():
 
 
     train_loader = DataLoader(trainset, batch_size=64, shuffle=True)
-
     test_loader = DataLoader(testset, batch_size=64, shuffle=False)
     # Modelo, função de perda e otimizador
     model = ForwardReLU(list_len_neurons=[28 * 28, 128, 20, 10])
@@ -38,7 +37,7 @@ def run():
                                  optimizer=optimizer,
                                  test_loader=test_loader)
 
-    trainer.fit(epochs=10)
+    trainer.fit(epochs=100)
     trainer.eval()
 
 
@@ -56,4 +55,4 @@ def grid_search():
 
 if __name__ == '__main__':
 
-    grid_search()
+    run()
