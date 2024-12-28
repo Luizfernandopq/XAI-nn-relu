@@ -22,8 +22,8 @@ class Explanator:
         bounds = deque()
 
         bounds.appendleft(self._explain_last_layer(instance_index))
-        # for index_layer in self.network.len_layers:
-
+        for index_layer in range(self.network.len_layers - 2, 1, -1):
+            print(f"explain intermediate: {index_layer}")
         return bounds
 
 

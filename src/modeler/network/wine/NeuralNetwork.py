@@ -12,12 +12,16 @@ class NeuralNetwork(nn.Module):
         self.layers = [ nn.Linear(self.list_len_neurons[layer],
                                   self.list_len_neurons[layer + 1]
                                   ) for layer in range(len_layers-1)]
-
         self.predictor = nn.Sequential(
             self.layers[0],
             nn.ReLU(),
-            self.layers[1]
+            
         )
+        # self.predictor = nn.Sequential(
+        #     *[layer for layer in self.layers] + [nn.ReLU()] * (len(self.layers) - 1)
+        # )
+        print(self.predictor)
+
 
     def forward(self, x):
         return self.predictor(x)

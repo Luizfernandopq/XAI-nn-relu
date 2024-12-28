@@ -80,7 +80,7 @@ if __name__ == '__main__':
         val_loader=val_loader
     )
 
-    trainer.fit(epochs=1)
+    trainer.fit(epochs=10)
     trainer.eval()
 
     data, tensors = extract_data_and_targets(trainer.val_loader)
