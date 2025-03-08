@@ -1,7 +1,13 @@
+import pandas as pd
+import torch
+from dateutil.rrule import rrule
 from torch.utils.data import Dataset
 
 
 class SimpleDataset(Dataset):
+    """
+    X, y devem ser do tipo torch.Tensor
+    """
     def __init__(self, X, y):
         self.X = X
         self.y = y
@@ -15,3 +21,14 @@ class SimpleDataset(Dataset):
         x_sample = self.X[idx]
         y_label = self.y[idx]
         return x_sample, y_label
+
+    def eat_other(self, other):
+        self.X = torch.cat([self.X, other.X])
+        self.y = torch.cat([self.y, other.y])
+        return self
+
+    def to_dataframe(self):
+        X = self.X.view(self.X.size(0), -1).cpu().numpy()
+        df = pd.DataFrame(X)
+        df['target'] = self.y.cpu().numpy()
+        return df

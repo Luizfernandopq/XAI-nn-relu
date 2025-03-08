@@ -33,3 +33,12 @@ class ForwardReLU(nn.Module):
         for index in range(index_layer):
             x = torch.relu(self.layers[index](x))
         return x
+
+    def get_all_neuron_values(self, x):
+        values = [x.cpu().numpy()]
+        for layer in range(self.len_layers - 2):
+            x = torch.relu(self.layers[layer](x))
+            values.append(x.detach().cpu().numpy())
+        x = self.layers[-1](x)
+        values.append(x.detach().cpu().numpy())
+        return values

@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # dataframe['target'] = bunch.target
     codificator = Codificator(nn_model, dataframe)
 
-    codificator.codify_network_milp_large_bounds()
+    codificator.codify_network_find_bounds()
 
-    for i, bounds in enumerate(codificator.bounds_large):
+    for i, bounds in enumerate(codificator.bounds.layers):
         print(i, bounds)

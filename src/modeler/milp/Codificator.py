@@ -1,33 +1,52 @@
 import numpy as np
+import pandas as pd
 from cplex import infinity
 
 import docplex.mp.model as mp
 
+from src.modeler.milp.BoundsContainer import BoundsContainer
+from src.modeler.network.ForwardReLU import ForwardReLU
+
+
 class Codificator:
+    """
+            Classe (codificação) responsável por encontrar bounds válidos para todos os neurônios com base nos valores presentes
+            no dataset para a entrada da rede
 
-    def __init__(self, network, dataframe):
+            Args:
+                network (ForwardReLU): A rede neural utilizada.
+                dataframe (pandas.DataFrame): O dataframe contendo os dados associados.
 
-        # Objetos: NeuralNetwork, DataFrame, mp.Model
+            Attr:
+                network (ForwardReLU): A rede neural que fornecerá pesos, bias e cálculos de valores de neurônios.
+
+                dataframe (pandas.DataFrame): Os dados utilizados para encontrar bounds.
+
+                milp_representation (mp.Model): Representação MILP (Mixed-Integer Linear Programming) da codificação.
+
+                input_variables (List[mp.Var]): Variáveis de entrada para representar os neurônios da camada de entrada.
+
+                intermediate_variables (List[List[mp.Var]]): Variáveis intermediárias geradas como continuous var para
+                                                             representar os neurônios das camadas intermediárias.
+
+                decision_variables (List[List[mp.Var]]): Variáveis de decisão no contexto MILP, geradas como binárias
+                                                         para representar a ativação ReLU.
+
+                output_variables (List[mp.Var]): Variáveis de saída para representar os neurônios da camada de saída
+    """
+
+    def __init__(self, network: ForwardReLU, data: pd.DataFrame):
         self.network = network
-        self.dataframe = dataframe
+        self.data = data
+        self.bounds = BoundsContainer(self.data)
         self.milp_represetation = None
-
-        # Input types é uma lista de string
-        # Bounds large é uma lista de lista de tuplas, [(x1_min, x1_max) ...][(y1_1_min, y1_1_max)...]...
-        # Lista contém várias listas em que cada lista é uma camada e cada item dessa lista é um neurônio e a
-        # tupla é o min max dos bounds do neurônio
-        self.input_types = None
-        self.bounds_large = None
 
         self.input_variables = None
         self.intermediate_variables = None
         self.decision_variables = None
         self.output_variables = None
 
-    def codify_network_milp_large_bounds(self):
-        self.bounds_large = []
-        self.bounds_large.append(self.get_types_and_bounds())
-
+    def codify_network_find_bounds(self):
         self.milp_represetation = mp.Model()
 
         self._init_input_variables()
@@ -39,9 +58,9 @@ class Codificator:
                                                                             name='o'
                                                                             )
 
-        self._codify_tjeng()
+        bounds = self._codify_tjeng()
 
-        return self.milp_represetation
+        return bounds
 
     def _codify_tjeng(self):
         len_layers = len(self.network.layers)
@@ -69,7 +88,7 @@ class Codificator:
                 if i != len_layers - 1:
                     if ub <= 0:
                         self.milp_represetation.add_constraint(y[j] == 0, ctname=f'c_{i}_{j}')
-                        ub = 0
+
                     elif lb >= 0:
                         self.milp_represetation.add_constraint(weighted_sum == y[j], ctname=f'c_{i}_{j}')
                     else:
@@ -83,8 +102,8 @@ class Codificator:
                     self.milp_represetation.add_constraint(weighted_sum == y[j])
 
                     bounds.append((lb, ub))
-            self.bounds_large.append(bounds)
-        return self.milp_represetation
+            self.bounds.layers.append(bounds)
+        return self.bounds
 
     def _maximize(self, expr):
         self.milp_represetation.maximize(expr)
@@ -102,7 +121,7 @@ class Codificator:
 
     def _init_input_variables(self):
         self.input_variables = []
-        for index, (domain_type, bounds) in enumerate(zip(self.input_types, self.bounds_large[0])):
+        for index, (domain_type, bounds) in enumerate(zip(self.bounds.input_types, self.bounds.layers[0])):
             lower_bound, upper_bound = bounds
             name = f'x_{index}'
             if domain_type == 'C':
@@ -128,16 +147,3 @@ class Codificator:
                                                                           lb=0,
                                                                           ub=1,
                                                                           key_format=f"_{idx_layer}_%s"))
-
-    def get_types_and_bounds(self):
-        self.input_types = []
-        columns = self.dataframe.columns
-        bounds = []
-        for column in columns:
-            unique_values = self.dataframe[column].unique()
-            self.input_types.append(
-                'B' if len(unique_values) == 2 else
-                'C' if np.any(unique_values.astype(np.int64) != unique_values.astype(np.float64)) else
-                'I')
-            bounds.append((self.dataframe[column].min(), self.dataframe[column].max()))
-        return bounds
