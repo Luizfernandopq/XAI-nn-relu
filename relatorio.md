@@ -41,3 +41,7 @@ Resultados finais do dia:
 
 Uma explicação de um bound inicial que fure os bounds a frente sempre será o próprio valor do neurônio.
 Isso ocorre porque o valor do neurônio acerta em um dos neurônios da próxima camada que foi devolvido a restrição
+
+## 07/03/2025
+
+Irei refatorar meus testes pois irei adicionar novas camadas de verificação

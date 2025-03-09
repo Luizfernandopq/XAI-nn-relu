@@ -23,6 +23,14 @@ class SimpleDataset(Dataset):
         return x_sample, y_label
 
     def eat_other(self, other):
+        """Incorpora outro SimpleDataset
+        Args:
+            other (SimpleDataset): dataset para ser incorporado
+
+        Returns:
+            self
+        """
+
         self.X = torch.cat([self.X, other.X])
         self.y = torch.cat([self.y, other.y])
         return self
