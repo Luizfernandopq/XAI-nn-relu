@@ -45,3 +45,22 @@ Isso ocorre porque o valor do neurônio acerta em um dos neurônios da próxima 
 ## 07/03/2025
 
 Irei refatorar meus testes pois irei adicionar novas camadas de verificação
+
+## 09/03/2025
+
+O código legacy foi testado para verificar-se o tamanho das explicações
+Foi utilizado os dados de teste em D-Explanations/wine/legacy_02.py com um modelo de 100.00% acurácia
+
+Os resultados foram: 
+- Média: 6.491525423728813
+- Mediana: 6.0
+- Máximo: 12
+- Mínimo: 2
+
+Outra rodada, para todo o dataset:
+
+- Média: 6.751054852320675
+- Mediana: 6.0
+- Máximo: 13
+- Mínimo: 3
+

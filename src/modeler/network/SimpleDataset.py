@@ -35,8 +35,9 @@ class SimpleDataset(Dataset):
         self.y = torch.cat([self.y, other.y])
         return self
 
-    def to_dataframe(self):
+    def to_dataframe(self, target=True):
         X = self.X.view(self.X.size(0), -1).cpu().numpy()
         df = pd.DataFrame(X)
-        df['target'] = self.y.cpu().numpy()
+        if target:
+            df['target'] = self.y.cpu().numpy()
         return df

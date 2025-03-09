@@ -16,13 +16,13 @@ def insert_output_constraints_tjeng(mdl, output_variables, network_output, binar
 
     return mdl
 
-def get_miminal_explanation(mdl, network_input, network_output, output_bounds, n_classes):
-
+def get_miminal_explanation(model, network_input, network_output, output_bounds, n_classes):
+    mdl = model.copy()
     output_variables = [mdl.get_var_by_name(f'o_{i}') for i in range(n_classes)]
     input_variables = [mdl.get_var_by_name(f'x_{i}') for i in range(len(network_input))]
     input_constraints = mdl.add_constraints([
         input_variables[i] == feature for i, feature in enumerate(network_input)], names='input')
-    binary_variables = mdl.binary_var_list(3 - 1, name='b')
+    binary_variables = mdl.binary_var_list(n_classes - 1, name='b')
 
     mdl.add_constraint(mdl.sum(binary_variables) >= 1)
     mdl = insert_output_constraints_tjeng(mdl, output_variables, network_output, binary_variables,
@@ -34,5 +34,4 @@ def get_miminal_explanation(mdl, network_input, network_output, output_bounds, n
         mdl.solve(log_output=False)
         if mdl.solution is not None:
             mdl.add_constraint(input_constraints[i])
-
     return mdl.find_matching_linear_constraints('input')
