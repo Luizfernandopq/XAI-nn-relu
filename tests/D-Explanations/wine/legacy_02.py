@@ -1,10 +1,8 @@
 import numpy as np
 import torch
-from requests.packages import target
+
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
-from sympy.stats.sampling.sample_numpy import numpy
-
 from src.legacy.codify_network import codify_network
 from src.legacy.explication import get_miminal_explanation
 from src.modeler.network.ForwardReLU import ForwardReLU
@@ -46,7 +44,7 @@ if __name__ == '__main__':
         inputs = get_miminal_explanation(model, instance, target, bounds, 3)
         len_inputs.append(len(inputs))
         print(inputs, "\n", len_inputs)
-        break
+
 
     media = np.mean(len_inputs)
     mediana = np.median(len_inputs)
