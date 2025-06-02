@@ -2,14 +2,15 @@ from time import time
 
 import numpy as np
 import torch
-
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
-from src.legacy.codify_network import codify_network
-from src.legacy.explication import get_miminal_explanation
+
+from src.modeler.explainer import generate_explanation
+from src.modeler.milp.Codificator import Codificator
 from src.modeler.network.ForwardReLU import ForwardReLU
 from src.modeler.network.ForwardReluTrainer import ForwardReluTrainer
 from src.modeler.network.SimpleDataset import SimpleDataset
+
 
 if __name__ == '__main__':
 
@@ -29,30 +30,28 @@ if __name__ == '__main__':
 
     # Network and Train
 
-    wine_network = ForwardReLU([13, 128, 128, 3])
+    wine_network = ForwardReLU([13, 256, 3])
     trainer = ForwardReluTrainer(wine_network, train_loader=None)
     trainer.update_loaders(train_set, test_set)
     trainer.fit(400)
-    trainer.eval()
 
-    model, bounds = codify_network(wine_network, train_set.eat_other(test_set).to_dataframe(target=False))
+    weights = [layer.weight.detach().numpy() for layer in wine_network.layers if hasattr(layer, 'weight')]
+    biases = [layer.bias.detach().numpy() for layer in wine_network.layers if
+              hasattr(layer, 'bias') and layer.bias is not None]
 
-    df = test_set.to_dataframe()
-    len_inputs = []
+    codificator = Codificator(wine_network, train_set.eat_other(test_set).to_dataframe(target=False))
+    bounds = codificator.codify_network_find_bounds()
+    tamanhos = []
     start = time()
-    for index, instance in df.iterrows():
-        target = instance["target"].astype(int)
-        instance = instance.drop("target")
-        # print(instance)
-        inputs = get_miminal_explanation(model, instance, target, bounds, 3)
-        # len_inputs.append(len(inputs))
-        # print(inputs, "\n", len_inputs)
+    for i in range(train_set.__len__()):
+        instance, y_true = train_set[i]
+        values = wine_network.get_all_neuron_values(instance)
+        result = generate_explanation(
+            np.argmax(values[-1]),
+            weights,
+            biases,
+            values,
+            bounds
+        )
     print(f"Tempo: {time() - start}")
 
-
-    # media = np.mean(len_inputs)
-    # mediana = np.median(len_inputs)
-    # maximo = np.max(len_inputs)
-    # minimo = np.min(len_inputs)
-    #
-    # print(f"Média: {media}, Mediana: {mediana}, Máximo: {maximo}, Mínimo: {minimo}")

@@ -35,9 +35,9 @@ class Codificator:
                 output_variables (List[mp.Var]): Variáveis de saída para representar os neurônios da camada de saída
     """
 
-    def __init__(self, network: ForwardReLU, data: pd.DataFrame):
+    def __init__(self, network: ForwardReLU, dataframe: pd.DataFrame):
         self.network = network
-        self.data = data
+        self.data = dataframe
         self.bounds = BoundsContainer(self.data)
         self.milp_represetation = None
 
@@ -60,7 +60,7 @@ class Codificator:
 
         bounds = self._codify_tjeng()
 
-        return bounds
+        return bounds.layers
 
     def _codify_tjeng(self):
         len_layers = len(self.network.layers)
@@ -108,6 +108,8 @@ class Codificator:
     def _maximize(self, expr):
         self.milp_represetation.maximize(expr)
         self.milp_represetation.solve()
+        if self.milp_represetation.solution is None:
+            return 0
         ub = self.milp_represetation.solution.get_objective_value()
         self.milp_represetation.remove_objective()
         return ub
@@ -115,6 +117,8 @@ class Codificator:
     def _minimize(self, expr):
         self.milp_represetation.minimize(expr)
         self.milp_represetation.solve()
+        if self.milp_represetation.solution is None:
+            return 0
         lb = self.milp_represetation.solution.get_objective_value()
         self.milp_represetation.remove_objective()
         return lb
