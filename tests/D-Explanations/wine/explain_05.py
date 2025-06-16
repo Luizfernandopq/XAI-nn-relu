@@ -1,19 +1,17 @@
 from time import time
 
 import numpy as np
-import pandas as pd
 import torch
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
-from torch.utils.data import DataLoader
+from sklearn.preprocessing import  MinMaxScaler
 
 from src.modeler.explainer import generate_explanation
 from src.modeler.milp.Codificator import Codificator
-
 from src.modeler.network.ForwardReLU import ForwardReLU
 from src.modeler.network.ForwardReluTrainer import ForwardReluTrainer
 from src.modeler.network.SimpleDataset import SimpleDataset
+
 
 if __name__ == '__main__':
 
@@ -37,8 +35,8 @@ if __name__ == '__main__':
 
     # Network and Train
 
-    wine_network = ForwardReLU([13, 8, 8, 8, 8, 3])
-    wine_network.load_state_dict(torch.load('wine_net_[13, 8, 8, 8, 8, 3]_weights01.pth', weights_only=True))
+    wine_network = ForwardReLU([13, 13, 3])
+    wine_network.load_state_dict(torch.load('wine_network_weights.pth', weights_only=True))
 
     wine_network.eval()
 
@@ -48,9 +46,9 @@ if __name__ == '__main__':
 
     codificator = Codificator(wine_network, train_set.eat_other(test_set).to_dataframe(target=False))
     bounds = codificator.codify_network_find_bounds()
-
-    start = time()
+    tamanhos = []
     for i in range(train_set.__len__()):
+        print(f"Explain: {i}")
         instance, y_true = train_set[i]
         values = wine_network.get_all_neuron_values(instance)
         result = generate_explanation(
@@ -60,6 +58,18 @@ if __name__ == '__main__':
             values,
             bounds
         )
+        print(f"Values: {values[-3].tolist()}")
+        print(f"Bounds: {bounds[-3]}")
+        print(f"Result: {result[-2]}")
+        tamanho = 0
+        for i in range(len(instance)):
+            if bounds[-3][i][1] != result[-2][i][1] or bounds[-3][i][0] != result[-2][i][0]:
+                tamanho += 1
+        tamanhos.append(tamanho)
 
-    print(f"Tempo: {time() - start}")
+    media = np.mean(tamanhos)
+    mediana = np.median(tamanhos)
+    maximo = np.max(tamanhos)
+    minimo = np.min(tamanhos)
 
+    print(f"Média: {media}, Mediana: {mediana}, Máximo: {maximo}, Mínimo: {minimo}")

@@ -1,11 +1,15 @@
+import numpy as np
 import pandas as pd
 import torch
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 from sympy.matrices.expressions.blockmatrix import bounds
 from torch.utils.data import DataLoader
 
-from src.modeler.milp.Explanator import Explanator
+from src.modeler.explainer import generate_explanation
+from src.modeler.milp.Codificator import Codificator
+
 from src.modeler.network.ForwardReLU import ForwardReLU
 from src.modeler.network.ForwardReluTrainer import ForwardReluTrainer
 from src.modeler.network.SimpleDataset import SimpleDataset
@@ -18,6 +22,10 @@ if __name__ == '__main__':
                                                         test_size=0.33,
                                                         random_state=42)
 
+    scaler = MinMaxScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
     X_train_t = torch.FloatTensor(X_train)
     y_train_t = torch.LongTensor(y_train)
     X_test_t = torch.FloatTensor(X_test)
@@ -28,19 +36,42 @@ if __name__ == '__main__':
 
     # Network and Train
 
-    wine_network = ForwardReLU([13, 3, 3])
+    wine_network = ForwardReLU([13, 128, 128, 3])
     trainer = ForwardReluTrainer(wine_network, train_loader=None)
     trainer.update_loaders(train_set, test_set)
-    trainer.fit(1000)
+    trainer.fit(400)
 
-    explanator = Explanator(wine_network,
-                            dataset=train_set.eat_other(test_set),
-                            dataframe=train_set.to_dataframe())
+    weights = [layer.weight.detach().numpy() for layer in wine_network.layers if hasattr(layer, 'weight')]
+    biases = [layer.bias.detach().numpy() for layer in wine_network.layers if
+              hasattr(layer, 'bias') and layer.bias is not None]
 
+    codificator = Codificator(wine_network, train_set.eat_other(test_set).to_dataframe(target=False))
+    bounds = codificator.codify_network_find_bounds()
+
+    tamanhos = []
     for i in range(train_set.__len__()):
-        print(f"Explain {i}")
-        bounds = explanator.back_explication(i)
-        # for j, bound in enumerate(bounds[0]):
-            # print(j, explanator.bounds.layers[-2][j])
-            # print(j, bound)
-        print()
+        print(f"Explain: {i}")
+        instance, y_true = train_set[i]
+        values = wine_network.get_all_neuron_values(instance)
+        result = generate_explanation(
+            np.argmax(values[-1]),
+            weights,
+            biases,
+            values,
+            bounds
+        )
+        print(f"Values: {values[0].tolist()}")
+        print(f"Bounds: {bounds[0]}")
+        print(f"Result: {result[0]}")
+        tamanho = 0
+        for i in range(len(instance)):
+            if bounds[0][i][1] != result[0][i][1] or bounds[0][i][0] != result[0][i][0]:
+                tamanho += 1
+        tamanhos.append(tamanho)
+
+    media = np.mean(tamanhos)
+    mediana = np.median(tamanhos)
+    maximo = np.max(tamanhos)
+    minimo = np.min(tamanhos)
+
+    print(f"Média: {media}, Mediana: {mediana}, Máximo: {maximo}, Mínimo: {minimo}")

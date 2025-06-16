@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 
 from src.modeler.explainer import generate_explanation
 from src.modeler.milp.Codificator import Codificator
@@ -19,6 +20,9 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = train_test_split(bunch.data, bunch.target,
                                                         test_size=0.33,
                                                         random_state=42)
+    scaler = MinMaxScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
 
     X_train_t = torch.FloatTensor(X_train)
     y_train_t = torch.LongTensor(y_train)
@@ -31,9 +35,9 @@ if __name__ == '__main__':
     # Network and Train
 
     wine_network = ForwardReLU([13, 256, 3])
-    trainer = ForwardReluTrainer(wine_network, train_loader=None)
-    trainer.update_loaders(train_set, test_set)
-    trainer.fit(400)
+    wine_network.load_state_dict(torch.load('wine_net_[13, 256, 3]_weights01.pth', weights_only=True))
+
+    wine_network.eval()
 
     weights = [layer.weight.detach().numpy() for layer in wine_network.layers if hasattr(layer, 'weight')]
     biases = [layer.bias.detach().numpy() for layer in wine_network.layers if

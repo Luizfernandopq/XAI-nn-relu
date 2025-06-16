@@ -1,4 +1,3 @@
-from time import time
 
 import numpy as np
 import torch
@@ -30,7 +29,7 @@ if __name__ == '__main__':
     # Network and Train
 
     wine_network = ForwardReLU([13, 13, 3])
-    wine_network.load_state_dict(torch.load('wine_network_weights.pth', weights_only=True))
+    wine_network.load_state_dict(torch.load('wine_net_[13, 13, 3]_not_normal_weights01.pth', weights_only=True))
 
     wine_network.eval()
 
