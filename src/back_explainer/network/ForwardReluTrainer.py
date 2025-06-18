@@ -8,8 +8,8 @@ import seaborn as sns
 from torch import optim, nn
 from torch.utils.data import DataLoader
 
-from src.modeler.network.ForwardReLU import ForwardReLU
-from src.modeler.network.SimpleDataset import SimpleDataset
+from src.back_explainer.network.ForwardReLU import ForwardReLU
+from src.back_explainer.network.SimpleDataset import SimpleDataset
 
 
 class ForwardReluTrainer:

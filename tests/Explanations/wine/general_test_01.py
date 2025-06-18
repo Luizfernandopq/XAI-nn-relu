@@ -1,7 +1,6 @@
 from time import time
 
 import numpy as np
-import pandas as pd
 import torch
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
@@ -9,11 +8,11 @@ from sklearn.preprocessing import MinMaxScaler
 
 from src.legacy.codify_network import codify_network
 from src.legacy.explication import get_miminal_explanation
-from src.modeler.explainer import generate_explanation
-from src.modeler.milp.Codificator import Codificator
+from src.back_explainer.milp.explainer import generate_explanation
+from src.back_explainer.milp.Codificator import Codificator
 
-from src.modeler.network.ForwardReLU import ForwardReLU
-from src.modeler.network.SimpleDataset import SimpleDataset
+from src.back_explainer.network.ForwardReLU import ForwardReLU
+from src.back_explainer.network.SimpleDataset import SimpleDataset
 
 if __name__ == '__main__':
 

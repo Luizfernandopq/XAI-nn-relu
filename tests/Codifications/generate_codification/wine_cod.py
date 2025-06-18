@@ -6,9 +6,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import  MinMaxScaler
 
 from src.legacy.codify_network import codify_network
-from src.modeler.milp.Codificator import Codificator
-from src.modeler.network.ForwardReLU import ForwardReLU
-from src.modeler.network.SimpleDataset import SimpleDataset
+from src.back_explainer.milp.Codificator import Codificator
+from src.back_explainer.network.ForwardReLU import ForwardReLU
+from src.back_explainer.network.SimpleDataset import SimpleDataset
 
 
 if __name__ == '__main__':

@@ -3,9 +3,9 @@ from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 
 from src.legacy.codify_network import codify_network
-from src.modeler.network.ForwardReLU import ForwardReLU
-from src.modeler.network.ForwardReluTrainer import ForwardReluTrainer
-from src.modeler.network.SimpleDataset import SimpleDataset
+from src.back_explainer.network.ForwardReLU import ForwardReLU
+from src.back_explainer.network.ForwardReluTrainer import ForwardReluTrainer
+from src.back_explainer.network.SimpleDataset import SimpleDataset
 
 if __name__ == '__main__':
 

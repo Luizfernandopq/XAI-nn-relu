@@ -42,3 +42,10 @@ class ForwardReLU(nn.Module):
         x = self.layers[-1](x)
         values.append(x.detach().cpu().numpy())
         return values
+
+    def predict_by_numpy(self, X_np):
+        X_np = torch.FloatTensor(X_np)
+        with torch.no_grad():
+            result = self.forward(X_np)
+            soft = torch.nn.functional.softmax(result, dim=1)
+        return soft.numpy()

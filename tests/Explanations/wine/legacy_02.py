@@ -9,8 +9,8 @@ from sklearn.preprocessing import MinMaxScaler
 
 from src.legacy.codify_network import codify_network
 from src.legacy.explication import get_miminal_explanation
-from src.modeler.network.ForwardReLU import ForwardReLU
-from src.modeler.network.SimpleDataset import SimpleDataset
+from src.back_explainer.network.ForwardReLU import ForwardReLU
+from src.back_explainer.network.SimpleDataset import SimpleDataset
 
 if __name__ == '__main__':
 

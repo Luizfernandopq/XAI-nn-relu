@@ -1,6 +1,6 @@
 import torch
 
-from src.modeler.network.ForwardReLU import ForwardReLU
+from src.back_explainer.network.ForwardReLU import ForwardReLU
 
 if __name__ == '__main__':
     model = ForwardReLU([13, 13, 13, 3])

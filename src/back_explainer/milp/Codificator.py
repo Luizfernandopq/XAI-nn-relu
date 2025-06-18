@@ -6,8 +6,8 @@ from cplex import infinity
 
 import docplex.mp.model as mp
 
-from src.modeler.milp.BoundsContainer import BoundsContainer
-from src.modeler.network.ForwardReLU import ForwardReLU
+from src.back_explainer.milp.BoundsContainer import BoundsContainer
+from src.back_explainer.network.ForwardReLU import ForwardReLU
 
 
 class Codificator:

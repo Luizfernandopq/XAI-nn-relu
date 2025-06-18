@@ -9,8 +9,8 @@ import torchvision.datasets as datasets
 from torch.utils.data import DataLoader
 
 from src.legacy.codify_network import codify_network
-from src.modeler.network.ForwardReLU import ForwardReLU
-from src.modeler.network.ForwardReluTrainer import ForwardReluTrainer
+from src.back_explainer.network.ForwardReLU import ForwardReLU
+from src.back_explainer.network.ForwardReluTrainer import ForwardReluTrainer
 
 def run():
     # Configurações
