@@ -61,14 +61,15 @@ def generate_explanation(
             explained_bounds[0]
         ))
 
-    explained_bounds.insert(0, explain_input_layer(
+    bounds, inputs = explain_input_layer(
         weights[0],
         bias[0],
         neuron_values[0],
         original_bounds[:2],
         explained_bounds[0]
-    ))
-    return explained_bounds
+    )
+    explained_bounds.insert(0, bounds)
+    return explained_bounds, inputs
 
 def explain_output_layer(
         output_predicted_index,
@@ -202,6 +203,8 @@ def explain_input_layer(
 
             # y > ub
             lb, ub = next_layer_bounds[o]
+            ub = (output_vars[o].ub + ub) / 2
+            lb = (output_vars[o].lb + lb) / 2
             if output_vars[o].ub != ub:
                 y_ge_ub_constraint = milp.add_constraint(output_vars[o] >= ub, ctname="y_j >= ub'_j")
                 to_min_constraint = milp.add_constraint(input_vars[j] >= input_layer_values[j])
@@ -212,11 +215,10 @@ def explain_input_layer(
                 milp.remove_objective()
 
                 if milp.solution is not None:
-                    minimized_x_j = milp.solution.get_objective_value()
-                    ub_j_minus_e = minimized_x_j - (minimized_x_j - input_layer_values[j]) * 0.01
-                    input_vars[j].ub = ub_j_minus_e
-                    # input_vars[j].ub = input_layer_values[j]
-                    milp.add_constraint(input_constraints[j])
+                    if milp.solution.get_objective_value() != input_vars[j].ub:
+                        milp.add_constraint(input_constraints[j])
+
+                    milp.remove_constraint(y_ge_ub_constraint)
                     break
 
                 to_max_constraint = milp.add_constraint(input_vars[j] <= input_layer_values[j])
@@ -229,12 +231,9 @@ def explain_input_layer(
                 milp.remove_constraint(y_ge_ub_constraint)
 
                 if milp.solution is not None:
-                    maximized_x_j = milp.solution.get_objective_value()
-                    lb_j_plus_e = maximized_x_j + (input_layer_values[j] - maximized_x_j) * 0.01
-                    input_vars[j].lb = lb_j_plus_e
-                    # input_vars[j].lb = input_layer_values[j]
+                    if milp.solution.get_objective_value() != input_vars[j].lb:
+                        milp.add_constraint(input_constraints[j])
 
-                    milp.add_constraint(input_constraints[j])
                     break
 
             if output_vars[o].lb != lb:
@@ -248,11 +247,10 @@ def explain_input_layer(
                 milp.remove_objective()
 
                 if milp.solution is not None:
-                    maximized_x_j = milp.solution.get_objective_value()
-                    lb_j_plus_e = maximized_x_j + (input_layer_values[j] - maximized_x_j) * 0.01
-                    input_vars[j].lb = lb_j_plus_e
-                    # input_vars[j].lb = input_layer_values[j]
-                    milp.add_constraint(input_constraints[j])
+                    if milp.solution.get_objective_value() != input_vars[j].lb:
+                        milp.add_constraint(input_constraints[j])
+
+                    milp.remove_constraint(y_le_lb_constraint)
                     break
 
                 to_min_constraint = milp.add_constraint(input_vars[j] >= input_layer_values[j])
@@ -265,15 +263,14 @@ def explain_input_layer(
                 milp.remove_constraint(y_le_lb_constraint)
 
                 if milp.solution is not None:
-                    minimized_x_j = milp.solution.get_objective_value()
-                    ub_j_minus_e = minimized_x_j - (minimized_x_j - input_layer_values[j]) * 0.01
-                    input_vars[j].ub = ub_j_minus_e
-                    # input_vars[j].ub = input_layer_values[j]
-                    milp.add_constraint(input_constraints[j])
+                    if milp.solution.get_objective_value() != input_vars[j].ub:
+                        milp.add_constraint(input_constraints[j])
+
                     break
 
         bounds.append((input_vars[j].lb,input_vars[j].ub))
-    return bounds
+
+    return bounds, milp.find_matching_linear_constraints('input')
 
 def explain_intermediate_layer(
         k_weights,
@@ -324,6 +321,8 @@ def explain_intermediate_layer(
 
             # y > ub
             lb, ub = next_layer_bounds[o]
+            ub = (output_vars[o].ub + ub) / 2
+            lb = (output_vars[o].lb + lb) / 2
             if output_vars[o].ub != ub:
                 y_ge_ub_constraint = milp.add_constraint(output_vars[o] >= ub, ctname="y_j >= ub'_j")
                 to_min_constraint = milp.add_constraint(input_vars[j] >= input_layer_values[j])
@@ -335,7 +334,7 @@ def explain_intermediate_layer(
 
                 if milp.solution is not None:
                     minimized_x_j = milp.solution.get_objective_value()
-                    ub_j_minus_e = minimized_x_j - (minimized_x_j - input_layer_values[j]) * 0.2
+                    ub_j_minus_e = minimized_x_j - (minimized_x_j - input_layer_values[j]) * 0.5
                     input_vars[j].ub = ub_j_minus_e
                     # input_vars[j].ub = input_layer_values[j]
                     # milp.add_constraint(input_constraints[j])
@@ -352,7 +351,7 @@ def explain_intermediate_layer(
 
                 if milp.solution is not None:
                     maximized_x_j = milp.solution.get_objective_value()
-                    lb_j_plus_e = maximized_x_j + (input_layer_values[j] - maximized_x_j) * 0.2
+                    lb_j_plus_e = maximized_x_j + (input_layer_values[j] - maximized_x_j) * 0.5
                     input_vars[j].lb = lb_j_plus_e
                     # input_vars[j].lb = input_layer_values[j]
 
@@ -371,7 +370,7 @@ def explain_intermediate_layer(
 
                 if milp.solution is not None:
                     maximized_x_j = milp.solution.get_objective_value()
-                    lb_j_plus_e = maximized_x_j + (input_layer_values[j] - maximized_x_j) * 0.2
+                    lb_j_plus_e = maximized_x_j + (input_layer_values[j] - maximized_x_j) * 0.5
                     input_vars[j].lb = lb_j_plus_e
                     # input_vars[j].lb = input_layer_values[j]
                     # milp.add_constraint(input_constraints[j])
@@ -388,7 +387,7 @@ def explain_intermediate_layer(
 
                 if milp.solution is not None:
                     minimized_x_j = milp.solution.get_objective_value()
-                    ub_j_minus_e = minimized_x_j - (minimized_x_j - input_layer_values[j]) * 0.2
+                    ub_j_minus_e = minimized_x_j - (minimized_x_j - input_layer_values[j]) * 0.5
                     input_vars[j].ub = ub_j_minus_e
                     # input_vars[j].ub = input_layer_values[j]
                     # milp.add_constraint(input_constraints[j])
@@ -416,7 +415,7 @@ def insert_constraints(milp, input_values, weights, bias, bounds_in, bounds_out)
 
     return input_vars, input_constraints, output_vars
 
-def find_interval(milp, input_value, input_var, is_relu_layer=True, epsilon=0.8):
+def find_interval(milp, input_value, input_var, is_relu_layer=True, epsilon=0.5):
         to_min_constraint = milp.add_constraint(input_var >= input_value)
 
         milp.minimize(input_var)

@@ -64,3 +64,12 @@ Outra rodada, para todo o dataset:
 - Máximo: 13
 - Mínimo: 3
 
+
+Formato de explicação deixado para trás para fins de possível utilização
+
+A explicação consiste em um epsilon 0.0 em todos as camadas, devolver a feature todas as vezes
+independentemente se ela é importante ou não, para abrir espaços para as outras.
+A explicação nesse caso torna-se uma verificação de quais features puderam ser alargadas até o máximo
+Esse alargamento consiste em tentar fazer: para neurônio da camada intermediária seguinte, tentar alargar
+o máximo da feature através do ub' e do lb'. Salienta-se que não possui garantia, mas tem bom desempenho no mnist.
+

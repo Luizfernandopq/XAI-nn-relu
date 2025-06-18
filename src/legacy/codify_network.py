@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import docplex.mp.model as mp
 from cplex import infinity
@@ -22,6 +24,7 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
             y = output_variables
 
         for j in range(A.shape[0]):
+
 
             mdl.maximize(A[j, :] @ x + b[j])
             mdl.solve()

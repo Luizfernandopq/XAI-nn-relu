@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import pandas as pd
 from cplex import infinity
@@ -63,6 +65,8 @@ class Codificator:
         return bounds.layers
 
     def _codify_tjeng(self):
+
+
         len_layers = len(self.network.layers)
         for i in range(len_layers):
             A = self.network.layers[i].weight.detach().numpy()

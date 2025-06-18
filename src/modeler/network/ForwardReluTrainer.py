@@ -115,7 +115,7 @@ class ForwardReluTrainer:
         plt.ylabel("Loss")
         plt.legend()
         plt.title("Gráfico das Losses de Treinamento e Teste")
-        plt.savefig("figures/treino.png")
+        # plt.savefig("figures/treino.png")
 
     def eval(self):
         self.model.eval()
@@ -156,4 +156,4 @@ class ForwardReluTrainer:
         plt.xlabel("Valores Preditos")
         plt.ylabel("Valores Reais")
         plt.title("Matriz de Confusão")
-        plt.savefig("figures/cm.png")
+        # plt.savefig("figures/cm.png")
