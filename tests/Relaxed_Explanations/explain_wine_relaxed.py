@@ -1,23 +1,31 @@
-import pickle
-from time import time
+from time import time, perf_counter
 
 import numpy as np
+import pandas as pd
 import torch
-from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
 
+
+from Datasets.wine.wine_dataset_utils import get_dataset_wine
 from src.legacy.codify_network import codify_network
 from src.legacy.explication import get_miminal_explanation
 
 from src.back_explainer.network.ForwardReLU import ForwardReLU
-from src.back_explainer.network.SimpleDataset import SimpleDataset
 from src.relax_explainer.relaxed_codify_network import relaxed_codify_network
 
+def test_fidelity(model, instance, inputs, target):
+    indexes = []
+    for j in inputs:
+        index_input = int(j.name.split("input")[1]) - 1
+        indexes.append(index_input)
+    for i in range(len(instance)):
+        if i not in indexes:
+            instance[i] = np.random.rand()
+    if model(instance.unsqueeze(0)).argmax(dim=1).item() == target:
+        return 1
+    return 0
 
-def run(layers=None):
-    if layers is None:
-        layers = [13, 16, 3]
+
+def run(layers, relax):
 
     layer_str = "_"
     for i in layers[:-1]:
@@ -25,85 +33,82 @@ def run(layers=None):
     layer_str += str(layers[-1])
 
     # Data
-    bunch = load_wine()
-    X_train, X_test, y_train, y_test = train_test_split(bunch.data, bunch.target,
-                                                        test_size=0.33,
-                                                        random_state=42)
-
-    scaler = MinMaxScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
-
-    X_train_t = torch.FloatTensor(X_train)
-    y_train_t = torch.LongTensor(y_train)
-    X_test_t = torch.FloatTensor(X_test)
-    y_test_t = torch.LongTensor(y_test)
-
-    train_set = SimpleDataset(X_train_t, y_train_t)
-    test_set = SimpleDataset(X_test_t, y_test_t)
+    train_set, test_set = get_dataset_wine()
 
     # Network and Train
 
     wine_network = ForwardReLU(layers)
     wine_network.load_state_dict(torch.load(f'../../Networks/wine/Weights/wine_net{layer_str}_weights01.pth',
                                             weights_only=True))
-
-
     wine_network.eval()
-
     all_set = train_set.eat_other(test_set)
     df = all_set.to_dataframe()
 
+    times = []
+    sizes = []
+    fidelities = 0
+
+
     relaxed_model, relaxed_bounds = relaxed_codify_network(wine_network, all_set.to_dataframe(target=False),
-                                                           relax_density=0.5)
+                                                           relax_density=relax)
 
-    len_inputs = []
-    start = time()
     for index, instance in df.iterrows():
         target = instance["target"].astype(int)
         instance = instance.drop("target")
-        # print(instance)
+
+        start = perf_counter()
         inputs = get_miminal_explanation(relaxed_model, instance, target, relaxed_bounds, 3)
-        len_inputs.append(len(inputs))
-        # print(inputs, "\n", len_inputs)
+        times.append(perf_counter() - start)
+        sizes.append(len(inputs))
 
-    print(f"Tempo Relaxed: {time() - start}")
-    media = np.mean(len_inputs)
-    mediana = np.median(len_inputs)
-    maximo = np.max(len_inputs)
-    minimo = np.min(len_inputs)
+        fidelities += test_fidelity(wine_network, all_set[index][0], inputs, target)
 
+    fidelities = fidelities/len(sizes)
+
+    media = np.mean(sizes)
+    mediana = np.median(sizes)
+    maximo = np.max(sizes)
+    minimo = np.min(sizes)
     print(f"Tamanho -> Média: {media}, Mediana: {mediana}, Máximo: {maximo}, Mínimo: {minimo}")
-
-    # ------------------------------------ PART 2 ----------------------------------------
-
-    model, bounds_legacy = codify_network(wine_network, all_set.to_dataframe(target=False))
-
-    len_inputs = []
-
-    start = time()
-    for index, instance in df.iterrows():
-        target = instance["target"].astype(int)
-        instance = instance.drop("target")
-        # print(instance)
-        inputs = get_miminal_explanation(model, instance, target, bounds_legacy, 3)
-        len_inputs.append(len(inputs))
-        # print(inputs, "\n", len_inputs)
-    print(f"Tempo legacy: {time() - start}")
-
-    media = np.mean(len_inputs)
-    mediana = np.median(len_inputs)
-    maximo = np.max(len_inputs)
-    minimo = np.min(len_inputs)
-
-    print(f"Tamanho -> Média: {media}, Mediana: {mediana}, Máximo: {maximo}, Mínimo: {minimo}")
+    print(f"Fidelidade: {fidelities}")
+    return times, sizes, fidelities
 
 
 if __name__ == '__main__':
-    list_layers = [[13, 16, 3],
-                   [13, 16, 16, 3],
-                   [13, 32, 3],
-                   [13, 32, 32, 3]]
+    experiments = {
+        "dataset": [],
+        "network": [],
+        "relaxation": [],
+        "time_mean": [],
+        "time_std": [],
+        "expl_size_mean": [],
+        "expl_size_std": [],
+        "fidelity": [],
+    }
+    list_layers = [[13, 16, 3]]#,
+                   # [13, 16, 16, 3],
+                   # [13, 32, 3],
+                   # [13, 32, 32, 3]]
+
+    relaxations = [0.0, 0.25, 0.50, 0.75]
+
     for layers in list_layers:
-        print(f"Rodando: {layers}")
-        run(layers)
+        for relax in relaxations:
+            net_str = f"Net_{len(layers) - 2}x{layers[1]}_hidden"
+
+            print(f"Rodando: {net_str} relax: {relax}")
+            start = time()
+            times, sizes, fidelitie = run(layers, relax)
+            print(f"Tempo: {time() - start}")
+            experiments["dataset"].append("wine")
+            experiments["network"].append(net_str)
+            experiments["relaxation"].append(relax)
+            experiments["time_mean"].append(np.mean(times))
+            experiments["time_std"].append(np.std(times))
+            experiments["expl_size_mean"].append(np.mean(sizes))
+            experiments["expl_size_std"].append(np.std(sizes))
+            experiments["fidelity"].append(fidelitie)
+
+    experiments = pd.DataFrame(experiments)
+    print(experiments)
+    experiments.to_csv(f"../../Results/wine.csv")
