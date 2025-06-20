@@ -26,7 +26,7 @@ class ForwardReluTrainer:
         - test_loader: (Opcional) DataLoader para os dados de validação.
         """
 
-        self.model = model.to(device)
+        self.model = model
         self.train_loader = train_loader
         self.device = device
         if optimizer is None:
@@ -55,7 +55,7 @@ class ForwardReluTrainer:
 
             # Forward pass
             outputs = self.model(inputs)
-            loss = self.criterion(outputs.to(self.device), labels.to(self.device))
+            loss = self.criterion(outputs, labels)
 
             # Backward pass
             loss.backward()
@@ -80,7 +80,7 @@ class ForwardReluTrainer:
 
                 # Forward pass
                 outputs = self.model(inputs)
-                loss = self.criterion(outputs.to(self.device), labels.to(self.device))
+                loss = self.criterion(outputs, labels)
 
                 running_loss += loss.item()
 
@@ -95,6 +95,7 @@ class ForwardReluTrainer:
 
     def fit(self, epochs):
         """Treina o modelo por múltiplas épocas."""
+        self.model.to(self.device)
         losses = []
         test_losses = []
 

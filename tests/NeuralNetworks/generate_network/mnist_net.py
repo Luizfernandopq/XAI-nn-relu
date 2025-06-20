@@ -1,23 +1,25 @@
+import time
 
 import torch
-from sklearn.preprocessing import MinMaxScaler
 import torch.optim as optim
-
-import torchvision.transforms as transforms
-import torchvision.datasets as datasets
-from torch.utils.data import DataLoader
 
 from Datasets.mnist.mnist_dataset_utils import get_dataloader_mnist
 from src.back_explainer.network.ForwardReLU import ForwardReLU
 from src.back_explainer.network.ForwardReluTrainer import ForwardReluTrainer
 
-if __name__ == '__main__':
-    device = torch.device('cpu')
+def run(layers):
+    layer_str = "_"
+    for i in layers[:-1]:
+        layer_str += str(i) + "x"
+    layer_str += str(layers[-1])
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # device = torch.device("cuda")
     print(f"Rodando em: {device}")
 
     train_loader, test_loader = get_dataloader_mnist()
 
-    model = ForwardReLU(list_len_neurons=[28 * 28, 16, 16, 10])
+    model = ForwardReLU(list_len_neurons=layers)
 
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
     trainer = ForwardReluTrainer(model=model,
@@ -28,4 +30,20 @@ if __name__ == '__main__':
 
     trainer.fit(epochs=20)
     trainer.eval()
-    # torch.save(model.state_dict(), f'../../../Networks/N-Weights/mnist_net_784x16x16x10_weights01.pth')
+    torch.save(model.state_dict(), f'../../../Networks/mnist/Weights/mnist_net{layer_str}_weights.pth')
+
+if __name__ == '__main__':
+    list_layers = [[28*28, 16, 16, 10],
+                   [28*28, 32, 32, 10],
+                   [28*28, 48, 48, 10],
+                   [28*28, 16, 16, 16, 10],
+                   [28*28, 32, 32, 32, 10],
+                   [28*28, 48, 48, 48, 10],
+                   [28*28, 16, 16, 16, 16, 10],
+                   [28*28, 32, 32, 32, 32, 10],
+                   [28*28, 48, 48, 48, 48, 10]]
+
+    for layers in list_layers:
+        start = time.time()
+        run(layers)
+        print(f"Treino {layers}", time.time()-start)

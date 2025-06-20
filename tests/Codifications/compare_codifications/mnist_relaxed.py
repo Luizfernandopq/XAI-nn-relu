@@ -29,7 +29,7 @@ def run(layers, relaxation=0.25):
     mnist_df = get_dataframe_mnist(target=False)
 
     mnist_network = ForwardReLU(layers)
-    mnist_network.load_state_dict(torch.load(f'../../../Networks/mnist/Weights/mnist_net{layer_str}_weights01.pth',
+    mnist_network.load_state_dict(torch.load(f'../../../Networks/mnist/Weights/mnist_net{layer_str}_weights.pth',
                                              weights_only=True))
 
 
@@ -49,14 +49,19 @@ def run(layers, relaxation=0.25):
 
 
 if __name__ == '__main__':
-    list_layers = [[28*28, 16, 10],
-                   [28*28, 16, 16, 10],
-                   [28*28, 32, 10],
-                   [28*28, 32, 32, 10],
-                   [28*28, 64, 10],
-                   [28*28, 64, 64, 10]]
+    list_layers = [[28 * 28, 16, 16, 10],
+                   [28 * 28, 32, 32, 10],
+                   [28 * 28, 16, 16, 16, 10],
+                   [28 * 28, 16, 16, 16, 16, 10]]
+
+    relaxations = [0.0, 0.075, 0.15, 0.20]
 
     for layers in list_layers:
-        print(f"Runnig codificator for: {layers}")
-        run(layers)
+
+        for relax in relaxations:
+            net_str = f"Net_{len(layers) - 2}x{layers[1]}_hidden"
+            print(f"Rodando: {net_str} relax: {relax}")
+            start = time.time()
+            run(layers, relax)
+            print(f"Tempo: {time.time() - start}")
 

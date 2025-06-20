@@ -6,7 +6,6 @@ import torch
 
 
 from Datasets.wine.wine_dataset_utils import get_dataset_wine
-from src.legacy.codify_network import codify_network
 from src.legacy.explication import get_miminal_explanation
 
 from src.back_explainer.network.ForwardReLU import ForwardReLU
