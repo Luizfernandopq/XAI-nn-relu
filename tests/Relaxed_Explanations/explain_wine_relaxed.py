@@ -38,7 +38,7 @@ def run(layers, relax):
     # Network and Train
 
     wine_network = ForwardReLU(layers)
-    wine_network.load_state_dict(torch.load(f'../../Networks/wine/Weights/wine_net{layer_str}_weights01.pth',
+    wine_network.load_state_dict(torch.load(f'../../Networks/wine/Weights/wine_net{layer_str}_weights.pth',
                                             weights_only=True))
     wine_network.eval()
     all_set = train_set.eat_other(test_set)
@@ -85,12 +85,18 @@ if __name__ == '__main__':
         "expl_size_std": [],
         "fidelity": [],
     }
-    list_layers = [[13, 16, 3]]#,
-                   # [13, 16, 16, 3],
-                   # [13, 32, 3],
-                   # [13, 32, 32, 3]]
 
-    relaxations = [0.0, 0.25, 0.50, 0.75]
+    list_layers = [[13, 16, 16, 3],
+                   [13, 32, 32, 3],
+                   [13, 48, 48, 3],
+                   [13, 16, 16, 16, 3],
+                   [13, 32, 32, 32, 3],
+                   [13, 48, 48, 48, 3],
+                   [13, 16, 16, 16, 16, 3],
+                   [13, 32, 32, 32, 32, 3],
+                   [13, 48, 48, 48, 48, 3]]
+
+    relaxations = [0.0, 0.25, 0.45, 0.60]
 
     for layers in list_layers:
         for relax in relaxations:
