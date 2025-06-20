@@ -55,6 +55,7 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
 def relaxed_codify_network(network, dataframe, relax_density=0.25):
     layers = network.layers
     mdl = mp.Model()
+    # mdl.parameters.simplex.tolerances.feasibility.set(1e-6)
 
     _, bounds_input = get_types_and_bounds(dataframe)
     bounds_input = np.array(bounds_input)

@@ -4,22 +4,21 @@ import numpy as np
 import pandas as pd
 import torch
 
-
 from Datasets.wine.wine_dataset_utils import get_dataset_wine
 from src.legacy.explication import get_miminal_explanation
 
 from src.back_explainer.network.ForwardReLU import ForwardReLU
 from src.relax_explainer.relaxed_codify_network import relaxed_codify_network
 
-def test_fidelity(model, instance, inputs, target):
+def test_fidelity(model, instance, inputs, prediction):
     indexes = []
     for j in inputs:
         index_input = int(j.name.split("input")[1]) - 1
         indexes.append(index_input)
     for i in range(len(instance)):
         if i not in indexes:
-            instance[i] = np.random.rand()
-    if model(instance.unsqueeze(0)).argmax(dim=1).item() == target:
+            instance[i] = np.random.uniform(0.01, 0.99)
+    if model(instance.unsqueeze(0)).argmax(dim=1).item() == prediction:
         return 1
     return 0
 
@@ -41,26 +40,26 @@ def run(layers, relax):
                                             weights_only=True))
     wine_network.eval()
     all_set = train_set.eat_other(test_set)
-    df = all_set.to_dataframe()
+    df = all_set.to_dataframe(target=False)
 
     times = []
     sizes = []
     fidelities = 0
 
 
-    relaxed_model, relaxed_bounds = relaxed_codify_network(wine_network, all_set.to_dataframe(target=False),
+    relaxed_model, relaxed_bounds = relaxed_codify_network(wine_network, df,
                                                            relax_density=relax)
 
     for index, instance in df.iterrows():
-        target = instance["target"].astype(int)
-        instance = instance.drop("target")
+        prediction = wine_network(torch.FloatTensor(instance).unsqueeze(0)).argmax(dim=1).item()
 
         start = perf_counter()
-        inputs = get_miminal_explanation(relaxed_model, instance, target, relaxed_bounds, 3)
+        inputs = get_miminal_explanation(relaxed_model, instance, prediction, relaxed_bounds, 3)
         times.append(perf_counter() - start)
         sizes.append(len(inputs))
+        print(f"Explicado {index}: {perf_counter() - start}")
 
-        fidelities += test_fidelity(wine_network, all_set[index][0], inputs, target)
+        fidelities += test_fidelity(wine_network, instance, inputs, prediction)
 
     fidelities = fidelities/len(sizes)
 

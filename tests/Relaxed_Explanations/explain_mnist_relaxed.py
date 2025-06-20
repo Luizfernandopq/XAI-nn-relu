@@ -13,12 +13,12 @@ from src.relax_explainer.relaxed_codify_network import relaxed_codify_network
 
 def plot_explanation(instance, explication):
 
-    image = instance.to_numpy().reshape(28, 28)
+    image = instance.reshape(28, 28)
     plt.imshow(image, cmap='gray')
     plt.title(f'Original')
     plt.axis('off')
     plt.show(block=False)
-    plt.pause(4)
+    plt.pause(6)
     # plt.close()
 
     image2 = explication.reshape(28, 28)
@@ -26,23 +26,27 @@ def plot_explanation(instance, explication):
     plt.title(f'Explicação:')
     plt.axis('off')
     plt.show(block=False)
-    plt.pause(4)
+    plt.pause(6)
     plt.close()
 
-def test_fidelity(model, instance, inputs, target):
+def test_fidelity(model, instance, inputs, prediciton):
     indexes = []
-    # explication = np.zeros(784, dtype=np.float32)
+    explication = np.zeros(784, dtype=np.float32)
     for j in inputs:
         index_input = int(j.name.split("input")[1]) - 1
         indexes.append(index_input)
-    #     explication[index_input] = 1.0
-    # plot_explanation(instance, explication)
+        explication[index_input] = 1.0
+
+    # plot_explanation(instance.to_numpy(), explication)
 
     instance = torch.FloatTensor(instance)
     for i in range(len(instance)):
         if i not in indexes:
-            instance[i] = np.random.rand()
-    if model(instance.unsqueeze(0)).argmax(dim=1).item() == target:
+            instance[i] = np.random.uniform(0.1, 0.9)
+
+    # plot_explanation(instance.numpy(), explication)
+
+    if model(instance.unsqueeze(0)).argmax(dim=1).item() == prediciton:
         return 1
     return 0
 
@@ -53,7 +57,7 @@ def run(layers, relaxation, relaxes):
         layer_str += str(i) + "x"
     layer_str += str(layers[-1])
 
-    mnist_df = get_dataframe_mnist(target=True)
+    mnist_df = get_dataframe_mnist(target=False)
 
     mnist_network = ForwardReLU(layers)
     mnist_network.load_state_dict(torch.load(f'../../Networks/mnist/Weights/mnist_net{layer_str}_weights.pth',
@@ -62,7 +66,7 @@ def run(layers, relaxation, relaxes):
     mnist_network.eval()
 
     start1 = time()
-    relaxed_model, relaxed_bounds = relaxed_codify_network(mnist_network, mnist_df.drop("target", axis=1),
+    relaxed_model, relaxed_bounds = relaxed_codify_network(mnist_network, mnist_df,
                                                            relax_density=relaxation)
 
     print(f"Explicação iniciada após: {time()-start1}")
@@ -73,15 +77,14 @@ def run(layers, relaxation, relaxes):
     for index, instance in mnist_df.iterrows():
         if index not in relaxes:
             continue
-        target = instance["target"].astype(int)
-        instance = instance.drop("target")
 
+        prediction = mnist_network(torch.FloatTensor(instance).unsqueeze(0)).argmax(dim=1).item()
         start = perf_counter()
-        inputs = get_miminal_explanation(relaxed_model, instance, target, relaxed_bounds, 10)
+        inputs = get_miminal_explanation(relaxed_model, instance, prediction, relaxed_bounds, 10)
         times.append(perf_counter() - start)
         sizes.append(len(inputs))
         print(f"Explicado {index}: {perf_counter() - start}")
-        fidelities += test_fidelity(mnist_network, instance, inputs, target)
+        fidelities += test_fidelity(mnist_network, instance, inputs, prediction)
 
 
     fidelities = fidelities / len(sizes)
@@ -113,28 +116,27 @@ if __name__ == '__main__':
     relaxations = [0.0, 0.075, 0.15, 0.20]
 
     relaxes = random.sample(range(0, 10000), 10)
+    # relaxes = [402]
     print(sorted(relaxes))
     for layers in list_layers:
 
         for relax in relaxations:
             net_str = f"Net_{len(layers) - 2}x{layers[1]}_hidden"
-            try:
-                print(f"Rodando: {net_str} relax: {relax}")
-                start = time()
-                times, sizes, fidelitie = run(layers, relax, relaxes)
-                print(f"Tempo: {time() - start}")
-                print()
 
-                experiments["dataset"].append("wine")
-                experiments["network"].append(net_str)
-                experiments["relaxation"].append(relax)
-                experiments["time_mean"].append(np.mean(times))
-                experiments["time_std"].append(np.std(times))
-                experiments["expl_size_mean"].append(np.mean(sizes))
-                experiments["expl_size_std"].append(np.std(sizes))
-                experiments["fidelity"].append(fidelitie)
-            except:
-                print(f"Falhou com: {layers}")
+            print(f"Rodando: {net_str} relax: {relax}")
+            start = time()
+            times, sizes, fidelitie = run(layers, relax, relaxes)
+            print(f"Tempo: {time() - start}")
+            print()
+
+            experiments["dataset"].append("wine")
+            experiments["network"].append(net_str)
+            experiments["relaxation"].append(relax)
+            experiments["time_mean"].append(np.mean(times))
+            experiments["time_std"].append(np.std(times))
+            experiments["expl_size_mean"].append(np.mean(sizes))
+            experiments["expl_size_std"].append(np.std(sizes))
+            experiments["fidelity"].append(fidelitie)
 
     experiments = pd.DataFrame(experiments)
     print(experiments)
