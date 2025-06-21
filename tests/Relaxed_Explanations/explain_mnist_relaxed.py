@@ -82,7 +82,7 @@ def run(layers, relaxation, relaxes):
         inputs = get_miminal_explanation(relaxed_model, instance, prediction, relaxed_bounds, 10)
         times.append(perf_counter() - start)
         sizes.append(len(inputs))
-        print(f"Explicado {index}: {perf_counter() - start}")
+        # print(f"Explicado {index}: {perf_counter() - start}")
         fidelities += test_fidelity(mnist_network, instance, inputs, prediction)
 
 
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
     relaxations = [0, 2, 4, 8]
 
-    relaxes = random.sample(range(0, 10000), 10)
+    relaxes = random.sample(range(0, 10000), 100)
     # relaxes = [402]
     print(sorted(relaxes))
     for layers in list_layers:
@@ -128,7 +128,7 @@ if __name__ == '__main__':
             print(f"Tempo: {time() - start}")
             print()
 
-            experiments["dataset"].append("wine")
+            experiments["dataset"].append("mnsit")
             experiments["network"].append(net_str)
             experiments["relaxation"].append(relax)
             experiments["time_mean"].append(np.mean(times))
