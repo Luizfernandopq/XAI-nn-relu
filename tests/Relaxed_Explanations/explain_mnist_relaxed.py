@@ -9,7 +9,8 @@ from matplotlib import pyplot as plt
 from Datasets.mnist.mnist_dataset_utils import get_dataframe_mnist
 from src.back_explainer.network.ForwardReLU import ForwardReLU
 from src.legacy.explication import get_miminal_explanation
-from src.relax_explainer.relaxed_codify_network import relaxed_codify_network
+from src.relax_explainer.relaxed_codify_network import relaxed_codify_network, get_types_and_bounds
+
 
 def plot_explanation(instance, explication):
 
@@ -29,7 +30,7 @@ def plot_explanation(instance, explication):
     plt.pause(6)
     plt.close()
 
-def test_fidelity(model, instance, inputs, prediciton):
+def test_fidelity(model, instance, inputs, predicition, domain):
     indexes = []
     explication = np.zeros(784, dtype=np.float32)
     for j in inputs:
@@ -39,14 +40,15 @@ def test_fidelity(model, instance, inputs, prediciton):
 
     # plot_explanation(instance.to_numpy(), explication)
 
-    instance = torch.FloatTensor(instance)
     for i in range(len(instance)):
         if i not in indexes:
-            instance[i] = np.random.uniform(0.1, 0.9)
+            lb, ub = domain[i]
+            instance[i] = np.random.uniform(lb, ub)
 
     # plot_explanation(instance.numpy(), explication)
+    instance = torch.FloatTensor(instance)
 
-    if model(instance.unsqueeze(0)).argmax(dim=1).item() == prediciton:
+    if model(instance.unsqueeze(0)).argmax(dim=1).item() == predicition:
         return 1
     return 0
 
@@ -67,8 +69,8 @@ def run(layers, relaxation, relaxes):
 
     start1 = time()
     relaxed_model, relaxed_bounds = relaxed_codify_network(mnist_network, mnist_df, relax_quatity=relaxation)
-
     print(f"Explicação iniciada após: {time()-start1}")
+    _, domain = get_types_and_bounds(mnist_df)
     times = []
     sizes = []
     fidelities = 0
@@ -83,7 +85,7 @@ def run(layers, relaxation, relaxes):
         times.append(perf_counter() - start)
         sizes.append(len(inputs))
         # print(f"Explicado {index}: {perf_counter() - start}")
-        fidelities += test_fidelity(mnist_network, instance, inputs, prediction)
+        fidelities += test_fidelity(mnist_network, instance, inputs, prediction, domain)
 
 
     fidelities = fidelities / len(sizes)
@@ -116,6 +118,7 @@ if __name__ == '__main__':
 
     relaxes = random.sample(range(0, 10000), 100)
     # relaxes = [402]
+    relaxes.append(402)
     print(sorted(relaxes))
     for layers in list_layers:
 

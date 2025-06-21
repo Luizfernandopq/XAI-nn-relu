@@ -60,7 +60,7 @@ def run(layers, relax):
         inputs = get_miminal_explanation(relaxed_model, instance, prediction, relaxed_bounds, 3)
         times.append(perf_counter() - start)
         sizes.append(len(inputs))
-        print(f"Explicado {index}: {perf_counter() - start}")
+        # print(f"Explicado {index}: {perf_counter() - start}")
 
         fidelities += test_fidelity(wine_network, instance, inputs, prediction)
 

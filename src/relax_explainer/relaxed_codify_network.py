@@ -96,7 +96,7 @@ def get_types_and_bounds(dataframe, ignore_int=True):
             unique_values = dataframe[column].unique()
             input_types.append(
                 'B' if len(unique_values) == 2 else
-                'C' if np.any(unique_values.astype(np.int64) != unique_values.astype(np.float64)) or ignore_int else
+                'C' if ignore_int or np.any(unique_values.astype(np.int64) != unique_values.astype(np.float64)) else
                 'I')
             bounds.append((dataframe[column].min(), dataframe[column].max()))
         return input_types, bounds
