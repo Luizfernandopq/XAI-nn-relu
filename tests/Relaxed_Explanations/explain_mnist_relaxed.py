@@ -66,8 +66,7 @@ def run(layers, relaxation, relaxes):
     mnist_network.eval()
 
     start1 = time()
-    relaxed_model, relaxed_bounds = relaxed_codify_network(mnist_network, mnist_df,
-                                                           relax_density=relaxation)
+    relaxed_model, relaxed_bounds = relaxed_codify_network(mnist_network, mnist_df, relax_quatity=relaxation)
 
     print(f"Explicação iniciada após: {time()-start1}")
     times = []
@@ -113,7 +112,7 @@ if __name__ == '__main__':
                    [28 * 28, 16, 16, 16, 10],
                    [28 * 28, 16, 16, 16, 16, 10]]
 
-    relaxations = [0.0, 0.075, 0.15, 0.20]
+    relaxations = [0, 2, 4, 8]
 
     relaxes = random.sample(range(0, 10000), 10)
     # relaxes = [402]

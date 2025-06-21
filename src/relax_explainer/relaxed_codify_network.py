@@ -52,7 +52,7 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
     return mdl, output_bounds
 
 
-def relaxed_codify_network(network, dataframe, relax_density=0.25):
+def relaxed_codify_network(network, dataframe, relax_quatity=0):
     layers = network.layers
     mdl = mp.Model()
     # mdl.parameters.simplex.tolerances.feasibility.set(1e-6)
@@ -75,11 +75,11 @@ def relaxed_codify_network(network, dataframe, relax_density=0.25):
 
     output_variables = mdl.continuous_var_list(layers[-1].weight.detach().numpy().T.shape[1], lb=-infinity, name='o')
 
-    assert 0 <= relax_density <= 1 , "Densidade da relaxação deve estar no intervalo {0, 1}"
-    if relax_density > 0.0:
+    # assert 0 <= relax_quatity <= len(decision_variables[0]) , ("Densidade da relaxação deve ser menor que"
+    #                                                            " a quantidade de binárias")
+    if relax_quatity > 0:
         for binary_vars in decision_variables:
-            num_relaxes = int(len(binary_vars) * relax_density)
-            relaxes = random.sample(range(0, len(binary_vars)), num_relaxes)
+            relaxes = random.sample(range(0, len(binary_vars)), relax_quatity)
 
             for index in relaxes:
                 binary_vars[index].set_vartype("Continuous")

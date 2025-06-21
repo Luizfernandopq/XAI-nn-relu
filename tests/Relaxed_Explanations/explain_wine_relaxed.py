@@ -18,7 +18,7 @@ def test_fidelity(model, instance, inputs, prediction):
     for i in range(len(instance)):
         if i not in indexes:
             instance[i] = np.random.uniform(0.01, 0.99)
-    if model(instance.unsqueeze(0)).argmax(dim=1).item() == prediction:
+    if model(torch.FloatTensor(instance).unsqueeze(0)).argmax(dim=1).item() == prediction:
         return 1
     return 0
 
@@ -42,13 +42,16 @@ def run(layers, relax):
     all_set = train_set.eat_other(test_set)
     df = all_set.to_dataframe(target=False)
 
+    start1 = time()
+    relaxed_model, relaxed_bounds = relaxed_codify_network(wine_network, df, relax_quatity=relax)
+
+    print(f"Explicação iniciada após: {time() - start1}")
+
     times = []
     sizes = []
     fidelities = 0
 
 
-    relaxed_model, relaxed_bounds = relaxed_codify_network(wine_network, df,
-                                                           relax_density=relax)
 
     for index, instance in df.iterrows():
         prediction = wine_network(torch.FloatTensor(instance).unsqueeze(0)).argmax(dim=1).item()
@@ -94,7 +97,7 @@ if __name__ == '__main__':
                    [13, 32, 32, 32, 32, 3],
                    [13, 48, 48, 48, 48, 3]]
 
-    relaxations = [0.0, 0.25, 0.45, 0.60]
+    relaxations = [0, 2, 4, 8]
 
     for layers in list_layers:
         for relax in relaxations:

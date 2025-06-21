@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     mdl_relax, out_bounds_relax = relaxed_codify_network(wine_network,
                                                          train_set.eat_other(test_set).to_dataframe(target=False),
-                                                         relax_density=0.25)
+                                                         relax_quatity=0.25)
 
     print(out_bounds_relax)
 

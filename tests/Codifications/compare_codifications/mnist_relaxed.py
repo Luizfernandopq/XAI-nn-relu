@@ -34,9 +34,7 @@ def run(layers, relaxation=0.25):
 
 
     start = time.perf_counter()
-    mdl_relax, out_bounds_relax = relaxed_codify_network(mnist_network,
-                                                         mnist_df,
-                                                         relax_density=relaxation)
+    mdl_relax, out_bounds_relax = relaxed_codify_network(mnist_network, mnist_df, relax_quatity=relaxation)
     print("Time to codify relaxed:", time.perf_counter() - start)
 
     print(out_bounds_relax)
