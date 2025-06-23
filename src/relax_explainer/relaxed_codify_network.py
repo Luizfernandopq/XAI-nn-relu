@@ -52,12 +52,12 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
     return mdl, output_bounds
 
 
-def relaxed_codify_network(network, dataframe, relax_quatity=0):
+def relaxed_codify_network(network, dataframe, relax_quatity=0, is_image=False):
     layers = network.layers
     mdl = mp.Model()
     # mdl.parameters.simplex.tolerances.feasibility.set(1e-6)
 
-    _, bounds_input = get_types_and_bounds(dataframe)
+    _, bounds_input = get_types_and_bounds(dataframe, is_image=is_image)
     bounds_input = np.array(bounds_input)
 
     input_variables = []
@@ -89,7 +89,7 @@ def relaxed_codify_network(network, dataframe, relax_quatity=0):
                                               output_variables)
     return mdl, output_bounds
 
-def get_types_and_bounds(dataframe, ignore_int=True):
+def get_types_and_bounds(dataframe, ignore_int=True, is_image=False):
         input_types = []
         bounds = []
         for column in dataframe.columns:
@@ -98,5 +98,8 @@ def get_types_and_bounds(dataframe, ignore_int=True):
                 'B' if len(unique_values) == 2 else
                 'C' if ignore_int or np.any(unique_values.astype(np.int64) != unique_values.astype(np.float64)) else
                 'I')
-            bounds.append((dataframe[column].min(), dataframe[column].max()))
+            if is_image:
+                bounds.append((np.float64(0.0), np.float64(1.0)))
+            else:
+                bounds.append((dataframe[column].min(), dataframe[column].max()))
         return input_types, bounds

@@ -68,7 +68,10 @@ def run(layers, relaxation, relaxes):
     mnist_network.eval()
 
     start1 = time()
-    relaxed_model, relaxed_bounds = relaxed_codify_network(mnist_network, mnist_df, relax_quatity=relaxation)
+    relaxed_model, relaxed_bounds = relaxed_codify_network(mnist_network,
+                                                           mnist_df,
+                                                           relax_quatity=relaxation,
+                                                           is_image=False)
     print(f"Explicação iniciada após: {time()-start1}")
     _, domain = get_types_and_bounds(mnist_df)
     times = []
@@ -84,9 +87,9 @@ def run(layers, relaxation, relaxes):
         inputs = get_miminal_explanation(relaxed_model, instance, prediction, relaxed_bounds, 10)
         times.append(perf_counter() - start)
         sizes.append(len(inputs))
-        # print(f"Explicado {index}: {perf_counter() - start}")
+        if len(times) % 20 == 1:
+            print(f"Checkpoint Explicado {len(times)}: {perf_counter() - start} | média: {np.mean(times)}")
         fidelities += test_fidelity(mnist_network, instance, inputs, prediction, domain)
-
 
     fidelities = fidelities / len(sizes)
 
@@ -97,31 +100,40 @@ def run(layers, relaxation, relaxes):
     print(f"Tamanho -> Média: {media}, Mediana: {mediana}, Máximo: {maximo}, Mínimo: {minimo} | Fidelidade: {fidelities}")
     return times, sizes, fidelities
 
+def append_results(experiments):
+    df = pd.read_csv(f"../../Results/mnist.csv", index_col=0)
+    experiments = pd.DataFrame(experiments)
+    df = pd.concat([df, experiments], ignore_index=True)
+    print(df)
+    df.to_csv(f"../../Results/mnist.csv")
 
 if __name__ == '__main__':
-    experiments = {
-        "dataset": [],
-        "network": [],
-        "relaxation": [],
-        "time_mean": [],
-        "time_std": [],
-        "expl_size_mean": [],
-        "expl_size_std": [],
-        "fidelity": [],
-    }
-    list_layers = [[28 * 28, 16, 16, 10],
-                   [28 * 28, 32, 32, 10],
+
+    list_layers = [#[28 * 28, 16, 16, 10],
+                   #[28 * 28, 32, 32, 10],
                    [28 * 28, 16, 16, 16, 10],
                    [28 * 28, 16, 16, 16, 16, 10]]
 
+
     relaxations = [0, 2, 4, 8]
 
-    relaxes = random.sample(range(0, 10000), 100)
+    # relaxes = random.sample(range(0, 10000), 100)
+    relaxes = [62, 99, 309, 378, 641, 794, 877, 1006, 1041, 1180, 1229, 1361, 1583, 1672, 1795, 1914, 2011, 2181, 2395, 2414, 2427, 2592, 2686, 2745, 2766, 2821, 3021, 3193, 3251, 3284, 3389, 3461, 3512, 3731, 3746, 4030, 4171, 4224, 4356, 4364, 4451, 4540, 4729, 4800, 4857, 4884, 4929, 5006, 5084, 5126, 5201, 5500, 5540, 5743, 5876, 5979, 6104, 6212, 6358, 6628, 6947, 6955, 7092, 7173, 7214, 7380, 7406, 7447, 7591, 7815, 7865, 7965, 8107, 8246, 8440, 8504, 8519, 8749, 8757, 8767, 8809, 8828, 8890, 8958, 9045, 9081, 9182, 9331, 9336, 9384, 9429, 9441, 9484, 9583, 9711, 9725, 9787, 9802, 9831, 9990]
+
     # relaxes = [402]
-    relaxes.append(402)
+    # relaxes.append(402)
     print(sorted(relaxes))
     for layers in list_layers:
-
+        experiments = {
+            "dataset": [],
+            "network": [],
+            "relaxation": [],
+            "time_mean": [],
+            "time_std": [],
+            "expl_size_mean": [],
+            "expl_size_std": [],
+            "fidelity": [],
+        }
         for relax in relaxations:
             net_str = f"Net_{len(layers) - 2}x{layers[1]}_hidden"
 
@@ -140,6 +152,7 @@ if __name__ == '__main__':
             experiments["expl_size_std"].append(np.std(sizes))
             experiments["fidelity"].append(fidelitie)
 
-    experiments = pd.DataFrame(experiments)
-    print(experiments)
-    experiments.to_csv(f"../../Results/mnist.csv")
+        append_results(experiments)
+    # experiments = pd.DataFrame(experiments)
+    # print(experiments)
+    # experiments.to_csv(f"../../Results/mnist.csv")
