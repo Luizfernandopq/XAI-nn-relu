@@ -7,7 +7,7 @@ import torch
 from Datasets.wine.wine_dataset_utils import get_dataset_wine
 from src.legacy.explication import get_miminal_explanation
 
-from src.back_explainer.network.ForwardReLU import ForwardReLU
+from src.relax_explainer.network.ForwardReLU import ForwardReLU
 from src.relax_explainer.relaxed_codify_network import relaxed_codify_network
 
 def test_fidelity(model, instance, inputs, prediction):

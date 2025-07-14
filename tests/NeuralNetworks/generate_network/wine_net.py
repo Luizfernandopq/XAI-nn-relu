@@ -1,8 +1,8 @@
 import torch
 
 from Datasets.wine.wine_dataset_utils import get_dataset_wine
-from src.back_explainer.network.ForwardReLU import ForwardReLU
-from src.back_explainer.network.ForwardReluTrainer import ForwardReluTrainer
+from src.relax_explainer.network.ForwardReLU import ForwardReLU
+from src.relax_explainer.network.ForwardReluTrainer import ForwardReluTrainer
 
 def run(layers):
     # Data

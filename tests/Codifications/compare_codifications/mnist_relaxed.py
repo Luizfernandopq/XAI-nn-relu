@@ -1,17 +1,9 @@
 import time
 
-import numpy as np
 import torch
-from requests.packages import target
-from sklearn.preprocessing import MinMaxScaler
-
-import torchvision.transforms as transforms
-import torchvision.datasets as datasets
 
 from Datasets.mnist.mnist_dataset_utils import get_dataframe_mnist
-from src.back_explainer.milp.explainer import generate_explanation
-from src.back_explainer.network.ForwardReLU import ForwardReLU
-from src.back_explainer.network.SimpleDataset import SimpleDataset
+from src.relax_explainer.network.ForwardReLU import ForwardReLU
 from src.legacy.codify_network import codify_network
 from src.relax_explainer.relaxed_codify_network import relaxed_codify_network
 

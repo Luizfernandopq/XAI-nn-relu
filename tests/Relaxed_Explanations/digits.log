@@ -1,0 +1,251 @@
+C:\Users\luizf\Dev\PycharmProjects\XAI-nn-relu\venv\Scripts\python.exe C:\Users\luizf\Dev\PycharmProjects\XAI-nn-relu\tests\Relaxed_Explanations\explain_digits_relaxed.py
+[797, 804]
+Rodando: Net_2x48_hidden relax: 0
+Explicação iniciada após: 50.39673113822937
+Explicado feature 0: 0.008797399990726262
+Explicado feature 1: 0.007517199992435053
+Explicado feature 2: 0.008187900006305426
+Explicado feature 3: 0.008383599983062595
+Explicado feature 4: 0.009549900016281754
+Explicado feature 5: 0.009957400005077943
+Explicado feature 6: 0.009783500019693747
+Explicado feature 7: 0.010442200000397861
+Explicado feature 8: 0.011958999995840713
+Explicado feature 9: 0.010997199977282435
+Explicado feature 10: 0.01001420000102371
+Explicado feature 11: 0.010518499999307096
+Explicado feature 12: 0.09969900001306087
+Explicado feature 13: 0.012871800019638613
+Explicado feature 14: 0.012248100014403462
+Explicado feature 15: 0.011665600002743304
+Explicado feature 16: 0.0110483999887947
+Explicado feature 17: 0.07922460002009757
+Explicado feature 18: 0.09076970000751317
+Explicado feature 19: 0.013925800012657419
+Explicado feature 20: 0.01379090000409633
+Explicado feature 21: 0.09022869999171235
+Explicado feature 22: 0.0964533000078518
+Explicado feature 23: 0.015136600006371737
+Explicado feature 24: 0.016485100000863895
+Explicado feature 25: 0.16821010000421666
+Explicado feature 26: 0.020154900004854426
+Explicado feature 27: 0.10179720001178794
+Explicado feature 28: 0.07749739999417216
+Explicado feature 29: 0.057820499991066754
+Explicado feature 30: 0.014320399990538135
+Explicado feature 31: 0.011998900008620694
+Explicado feature 32: 0.011759900022298098
+Explicado feature 33: 0.1326435999944806
+Explicado feature 34: 0.13411529999575578
+Explicado feature 35: 0.067423799977405
+Explicado feature 36: 0.014340299996547401
+Explicado feature 37: 0.0816311999806203
+Explicado feature 38: 0.011890499998116866
+Explicado feature 39: 0.011389899998903275
+Explicado feature 40: 0.01364420002209954
+Explicado feature 41: 0.1840270000102464
+Explicado feature 42: 0.07636230002390221
+Explicado feature 43: 0.07004230000893585
+Explicado feature 44: 0.12009270000271499
+Explicado feature 45: 0.08372699999017641
+Explicado feature 46: 0.01393590000225231
+Explicado feature 47: 0.012932100013131276
+Explicado feature 48: 0.013416200003121048
+Explicado feature 49: 0.01311070000519976
+Explicado feature 50: 0.1416480999905616
+Explicado feature 51: 0.10870719997910783
+Explicado feature 52: 0.07869269998627715
+Explicado feature 53: 0.07847040001070127
+Explicado feature 54: 0.06948000000556931
+Explicado feature 55: 0.22894390000146814
+Explicado feature 56: 0.06573110001045279
+Explicado feature 57: 0.07817110000178218
+Explicado feature 58: 0.07887749999645166
+Explicado feature 59: 0.06892029999289662
+Explicado feature 60: 0.07813959999475628
+Explicado feature 61: 0.10728749999543652
+Explicado feature 62: 0.08662200000253506
+Explicado feature 63: 0.1034141999843996
+Checkpoint Explicado 1: 3.5833867999899667 | média: 3.5826134999806527 | Fidelidade 1.0
+Explicado feature 0: 0.008291400008602068
+Explicado feature 1: 0.008853100007399917
+Explicado feature 2: 0.009442899987334386
+Explicado feature 3: 0.011859700025524944
+Explicado feature 4: 0.027771699998993427
+Explicado feature 5: 0.05007789999945089
+Explicado feature 6: 0.04856900000595488
+Explicado feature 7: 0.09247350000077859
+Explicado feature 8: 0.0642101000121329
+Explicado feature 9: 0.05807190001360141
+Explicado feature 10: 0.28257299997494556
+Explicado feature 11: 0.33234779999474995
+Explicado feature 12: 0.22554779998608865
+Explicado feature 13: 0.9368978999846149
+Explicado feature 14: 4.36733879998792
+Explicado feature 15: 15.07176389999222
+Explicado feature 16: 0.15233209999860264
+Explicado feature 17: 2.3354555999976583
+Explicado feature 18: 0.07625199999893084
+Explicado feature 19: 0.07504480000352487
+Explicado feature 20: 0.09143909998238087
+Explicado feature 21: 0.08153940000920556
+Explicado feature 22: 0.4217913999746088
+Explicado feature 23: 2.283619499998167
+Explicado feature 24: 0.09964850000687875
+Explicado feature 25: 0.07001619998482056
+Explicado feature 26: 0.086696899990784
+Explicado feature 27: 0.05863149999640882
+Explicado feature 28: 0.16047219999018125
+Explicado feature 29: 0.2642768000077922
+Explicado feature 30: 0.08588160001090728
+Explicado feature 31: 7.837086400017142
+Explicado feature 32: 17.792430800007423
+Explicado feature 33: 0.14383610000368208
+Explicado feature 34: 0.139311099977931
+Explicado feature 35: 0.25426069999230094
+Explicado feature 36: 0.36605119999148883
+Explicado feature 37: 0.8255912000022363
+Explicado feature 38: 0.08458510000491515
+Explicado feature 39: 13.349352799996268
+Explicado feature 40: 1.0891934999963269
+Explicado feature 41: 104.87573130000965
+Explicado feature 42: 0.17191649999585934
+Explicado feature 43: 0.1536711000080686
+Explicado feature 44: 1.9617752000049222
+Explicado feature 45: 0.6681933999934699
+Explicado feature 46: 339.8605979999993
+Explicado feature 47: 1275.4422709000064
+
+Process finished with exit code -1
+C:\Users\luizf\Dev\PycharmProjects\XAI-nn-relu\venv\Scripts\python.exe C:\Users\luizf\Dev\PycharmProjects\XAI-nn-relu\tests\Relaxed_Explanations\explain_digits_relaxed.py
+[804]
+Rodando: Net_2x48_hidden relax: 2
+Explicação iniciada após: 61.370747566223145
+Explicado feature 0: 0.008378999977139756
+Explicado feature 1: 0.008043799985898659
+Explicado feature 2: 0.008041900000534952
+Explicado feature 3: 0.011152199993375689
+Explicado feature 4: 0.06307000000379048
+Explicado feature 5: 0.05178920002072118
+Explicado feature 6: 0.06046029998105951
+Explicado feature 7: 0.0752589000039734
+Explicado feature 8: 0.10648799999034964
+Explicado feature 9: 0.07105569998384453
+Explicado feature 10: 0.2565836999856401
+Explicado feature 11: 0.658255399990594
+Explicado feature 12: 0.35164849998545833
+Explicado feature 13: 0.3755519999831449
+Explicado feature 14: 0.41498000000137836
+Explicado feature 15: 0.5529541000141762
+Explicado feature 16: 0.9159638000128325
+Explicado feature 17: 2.3846375000139233
+Explicado feature 18: 0.18212640000274405
+Explicado feature 19: 0.11828900000546128
+Explicado feature 20: 0.3926140999828931
+Explicado feature 21: 0.6410896000161301
+Explicado feature 22: 0.34900039999047294
+Explicado feature 23: 0.21868769999127835
+Explicado feature 24: 0.12649870000313967
+Explicado feature 25: 0.06485429999884218
+Explicado feature 26: 0.0798128999886103
+Explicado feature 27: 0.13876230001915246
+Explicado feature 28: 0.1933648000122048
+Explicado feature 29: 0.11744110001018271
+Explicado feature 30: 0.08994889998575673
+Explicado feature 31: 0.6876951000012923
+Explicado feature 32: 2.632803499989677
+Explicado feature 33: 0.18908909999299794
+Explicado feature 34: 0.0627389999863226
+Explicado feature 35: 0.06076670001493767
+Explicado feature 36: 0.08185909999883734
+Explicado feature 37: 0.07319999998435378
+Explicado feature 38: 0.15217380001558922
+Explicado feature 39: 3.661324999993667
+Explicado feature 40: 0.6834380000072997
+Explicado feature 41: 12.778250000003027
+Explicado feature 42: 0.18402429998968728
+Explicado feature 43: 0.11010089999763295
+Explicado feature 44: 0.2531122000073083
+Explicado feature 45: 0.16641219999291934
+Explicado feature 46: 43.56907409999985
+Explicado feature 47: 28.93420530000003
+Explicado feature 48: 12.070840800006408
+Explicado feature 49: 13.39569040000788
+Explicado feature 50: 68.57611439999891
+Explicado feature 51: 0.16634789999807253
+Explicado feature 52: 0.07834610002464615
+Explicado feature 53: 0.07212119997711852
+Explicado feature 54: 10.036428699997487
+Explicado feature 55: 0.14778160001151264
+Explicado feature 56: 150.7978151999996
+Explicado feature 57: 351.03239519998897
+Explicado feature 58: 2.162165899993852
+Explicado feature 59: 376.310856600001
+Explicado feature 60: 0.6750038999889512
+Explicado feature 61: 6.865999700006796
+Explicado feature 62: 0.3345102000166662
+Explicado feature 63: 1.9237745999998879
+Checkpoint Explicado 1: 1098.0257411000202 | média: 1098.0248489000078 | Fidelidade 1.0
+Tamanho -> Média: 40.0, Mediana: 40.0, Máximo: 40, Mínimo: 40
+Fidelidade: 1.0
+Tempo: 1159.4327054023743
+
+
+Process finished with exit code 0
+C:\Users\luizf\Dev\PycharmProjects\XAI-nn-relu\venv\Scripts\python.exe C:\Users\luizf\Dev\PycharmProjects\XAI-nn-relu\tests\Relaxed_Explanations\explain_digits_relaxed.py
+[7, 12, 45, 67, 75, 98, 131, 143, 167, 174, 187, 205, 213, 229, 231, 256, 257, 260, 284, 297, 306, 311, 346, 358, 362, 388, 419, 427, 431, 443, 445, 450, 451, 457, 458, 467, 468, 474, 485, 486, 500, 507, 511, 517, 519, 543, 564, 566, 567, 578, 589, 600, 613, 614, 620, 626, 644, 648, 662, 666, 682, 691, 692, 700, 719, 725, 731, 737, 748, 779, 797, 804, 806, 817, 829, 834, 837, 838, 844, 846, 849, 865, 867, 894, 922, 925, 936, 944, 950, 958, 959, 962, 964, 966, 972, 981, 1023, 1025, 1027, 1044, 1047, 1056, 1061, 1063, 1069, 1075, 1082, 1095, 1108, 1117, 1139, 1156, 1161, 1179, 1182, 1199, 1210, 1212, 1218, 1223, 1233, 1240, 1242, 1245, 1246, 1259, 1264, 1268, 1313, 1315, 1326, 1337, 1340, 1347, 1357, 1362, 1364, 1365, 1370, 1373, 1392, 1396, 1397, 1404, 1411, 1413, 1419, 1424, 1438, 1444, 1457, 1464, 1481, 1487, 1497, 1520, 1523, 1552, 1564, 1580, 1587, 1596, 1600, 1606, 1612, 1613, 1627, 1631, 1651, 1653, 1659, 1662, 1684, 1730, 1745, 1749, 1754, 1756, 1762, 1771]
+Rodando: Net_2x16_hidden relax: 8
+Explicação iniciada após: 2.907945394515991
+Checkpoint Explicado 1: 0.5321816000214312 | média: 0.5318038999976125 | Fidelidade 1.0
+Checkpoint Explicado 51: 0.5533004000026267 | média: 0.5607247235288835 | Fidelidade 1.0
+Checkpoint Explicado 101: 0.5496194000006653 | média: 0.5678959099007056 | Fidelidade 1.0
+Checkpoint Explicado 151: 0.6017280999803916 | média: 0.5706497456952436 | Fidelidade 1.0
+Tamanho -> Média: 63.94444444444444, Mediana: 64.0, Máximo: 64, Mínimo: 60
+Fidelidade: 1.0
+Tempo: 107.26161241531372
+
+Rodando: Net_2x32_hidden relax: 8
+Explicação iniciada após: 6.9119789600372314
+Checkpoint Explicado 1: 0.6107028000114951 | média: 0.6103787000174634 | Fidelidade 1.0
+Checkpoint Explicado 51: 0.7351101999811362 | média: 1.02954388627504 | Fidelidade 1.0
+Checkpoint Explicado 101: 2.168016899988288 | média: 0.8751189247529266 | Fidelidade 1.0
+Checkpoint Explicado 151: 0.7057806000229903 | média: 0.8206250271524784 | Fidelidade 1.0
+Tamanho -> Média: 63.78888888888889, Mediana: 64.0, Máximo: 64, Mínimo: 50
+Fidelidade: 1.0
+Tempo: 152.25234365463257
+
+Rodando: Net_2x48_hidden relax: 8
+Explicação iniciada após: 43.21678829193115
+Checkpoint Explicado 1: 0.8719722000241745 | média: 0.8716384000144899 | Fidelidade 1.0
+Checkpoint Explicado 51: 0.8654665000212844 | média: 0.8978012784335114 | Fidelidade 1.0
+Checkpoint Explicado 101: 0.8650106999848504 | média: 0.931007839605618 | Fidelidade 0.9900990099009901
+Checkpoint Explicado 151: 1.0014344000082929 | média: 0.9073391218547515 | Fidelidade 0.9867549668874173
+Tamanho -> Média: 62.983333333333334, Mediana: 64.0, Máximo: 64, Mínimo: 25
+Fidelidade: 0.9888888888888889
+Tempo: 218.203848361969
+
+Rodando: Net_3x16_hidden relax: 8
+Explicação iniciada após: 4.144792318344116
+Checkpoint Explicado 1: 0.714330599992536 | média: 0.7139598999929149 | Fidelidade 1.0
+Checkpoint Explicado 51: 0.6219588000094518 | média: 0.6802485411765291 | Fidelidade 1.0
+Checkpoint Explicado 101: 0.647505100001581 | média: 0.6732686762366614 | Fidelidade 1.0
+Checkpoint Explicado 151: 0.6542883999936748 | média: 0.6721449635754454 | Fidelidade 1.0
+Tamanho -> Média: 64.0, Mediana: 64.0, Máximo: 64, Mínimo: 64
+Fidelidade: 1.0
+Tempo: 125.502436876297
+
+Rodando: Net_3x32_hidden relax: 8
+Explicação iniciada após: 14.914262294769287
+Checkpoint Explicado 1: 1.0616884999908507 | média: 1.0613203999819234 | Fidelidade 1.0
+Checkpoint Explicado 51: 1.0270769000053406 | média: 2.9577724941185557 | Fidelidade 1.0
+Checkpoint Explicado 101: 1.050133700016886 | média: 2.0079272257421734 | Fidelidade 1.0
+Checkpoint Explicado 151: 1.1386834000004455 | média: 1.6899404708602133 | Fidelidade 1.0
+Tamanho -> Média: 63.88333333333333, Mediana: 64.0, Máximo: 64, Mínimo: 43
+Fidelidade: 1.0
+Tempo: 299.9565427303314
+
+Rodando: Net_3x48_hidden relax: 8
+Explicação iniciada após: 258.6431062221527
+Checkpoint Explicado 1: 1.4335039000143297 | média: 1.433143000002019 | Fidelidade 1.0
+
+Process finished with exit code -1

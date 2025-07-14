@@ -73,3 +73,12 @@ A explicação nesse caso torna-se uma verificação de quais features puderam s
 Esse alargamento consiste em tentar fazer: para neurônio da camada intermediária seguinte, tentar alargar
 o máximo da feature através do ub' e do lb'. Salienta-se que não possui garantia, mas tem bom desempenho no mnist.
 
+[59, 167, 423, 429, 434, 465, 677, 911, 959, 971, 1197, 1294, 1316, 1399, 1476, 1538, 1572, 1637, 1772, 1811, 1831, 1932, 1988, 2045, 2214, 2246, 2643, 2668, 2691, 2783, 3006, 3023, 3167, 3268, 3585, 3661, 3667, 4064, 4198, 4275, 4557, 4679, 4855, 4907, 5047, 5192, 5270, 5334, 5349, 5394, 5420, 5431, 5461, 5543, 5637, 5785, 5867, 6009, 6028, 6064, 6225, 6368, 6516, 6526, 6646, 6648, 6747, 6777, 6781, 6804, 6828, 6969, 7051, 7172, 7183, 7281, 7309, 7574, 7610, 7765, 8076, 8093, 8257, 8327, 8366, 8498, 8697, 8740, 8829, 8860, 8875, 9008, 9034, 9280, 9525, 9804, 9837, 9852, 9944, 9998]
+Rodando: Net_2x16_hidden relax: 0
+Explicação iniciada após: 12.891282796859741
+Checkpoint Explicado 1: 19.40043879998848 | média: 19.396409899927676 | Fidelidade 1.0
+Checkpoint Explicado 21: 16.893262699712068 | média: 33.23096832850327 | Fidelidade 0.9523809523809523
+Checkpoint Explicado 41: 26.165952499955893 | média: 28.88571865609052 | Fidelidade 0.926829268292683
+Checkpoint Explicado 61: 18.335331600159407 | média: 31.11415790656551 | Fidelidade 0.9344262295081968
+Checkpoint Explicado 81: 125.62070789979771 | média: 36.86310364074867 | Fidelidade 0.9259259259259259
+testar digits com 2 x 48 instância 804

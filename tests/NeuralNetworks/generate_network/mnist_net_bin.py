@@ -3,7 +3,7 @@ import time
 import torch
 import torch.optim as optim
 
-from Datasets.mnist.mnist_dataset_utils import get_dataloader_mnist
+from Datasets.mnist.mnist_dataset_utils import get_dataloader_mnist_binary
 from src.relax_explainer.network.ForwardReLU import ForwardReLU
 from src.relax_explainer.network.ForwardReluTrainer import ForwardReluTrainer
 
@@ -17,7 +17,7 @@ def run(layers):
     # device = torch.device("cuda")
     print(f"Rodando em: {device}")
 
-    train_loader, test_loader = get_dataloader_mnist()
+    train_loader, test_loader = get_dataloader_mnist_binary()
 
     model = ForwardReLU(list_len_neurons=layers)
 
@@ -30,18 +30,17 @@ def run(layers):
 
     trainer.fit(epochs=20)
     trainer.eval()
-    torch.save(model.state_dict(), f'../../../Networks/mnist/Weights/mnist_net{layer_str}_weights.pth')
+    acc = trainer.eval()
+    print("ACCC", acc)
+    if acc > 0.91:
+        torch.save(model.state_dict(), f'../../../Networks/mnist_bin/Weights/mnist_net{layer_str}_weights.pth')
+    return acc
 
 if __name__ == '__main__':
-    list_layers = [[28*28, 16, 16, 10],
-                   [28*28, 32, 32, 10],
-                   [28*28, 48, 48, 10],
-                   [28*28, 16, 16, 16, 10],
-                   [28*28, 32, 32, 32, 10],
-                   [28*28, 48, 48, 48, 10],
-                   [28*28, 16, 16, 16, 16, 10],
-                   [28*28, 32, 32, 32, 32, 10],
-                   [28*28, 48, 48, 48, 48, 10]]
+    list_layers = [[28 * 28, 16, 16, 2],
+                   [28 * 28, 32, 32, 2],
+                   [28 * 28, 16, 16, 16, 2],
+                   [28 * 28, 16, 16, 16, 16, 2]]
 
     for layers in list_layers:
         start = time.time()

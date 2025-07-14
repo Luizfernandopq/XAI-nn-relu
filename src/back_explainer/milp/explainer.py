@@ -1,11 +1,6 @@
-import time
 import docplex.mp.model as mp
 import numpy as np
-import pandas as pd
 
-from src.back_explainer.milp.Codificator import Codificator
-from src.back_explainer.network.ForwardReLU import ForwardReLU
-from src.back_explainer.network.SimpleDataset import SimpleDataset
 
 def generate_explanation(
         output_predicted_index,

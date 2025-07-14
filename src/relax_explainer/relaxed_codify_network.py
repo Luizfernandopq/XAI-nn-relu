@@ -1,4 +1,5 @@
 import random
+import time
 
 import numpy as np
 import docplex.mp.model as mp
@@ -19,17 +20,20 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
             y = intermediate_variables[i]
         else:
             y = output_variables
-
+        start = time.perf_counter()
         for j in range(A.shape[0]):
 
+            print(i, j, time.perf_counter() - start)
+            start = time.perf_counter()
             mdl.maximize(A[j, :] @ x + b[j])
             mdl.solve()
             ub = mdl.solution.get_objective_value()
             mdl.remove_objective()
 
             if ub <= 0 and i != len(layers) - 1:
-                 mdl.add_constraint(y[j] == 0, ctname=f'c_{i}_{j}')
-                 continue
+                mdl.add_constraint(y[j] == 0, ctname=f'c_{i}_{j}')
+                continue
+
 
             mdl.minimize(A[j, :] @ x + b[j])
             mdl.solve()
@@ -39,14 +43,16 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
             if lb >= 0 and i != len(layers) - 1:
                 mdl.add_constraint(A[j, :] @ x + b[j] == y[j], ctname=f'c_{i}_{j}')
                 continue
-
             if i != len(layers) - 1:
+                # lb = lb * 0.99
+                # ub = ub * 0.99
                 mdl.add_constraint(y[j] <= A[j, :] @ x + b[j] - lb * (1 - a[j]))
                 mdl.add_constraint(y[j] >= A[j, :] @ x + b[j])
                 mdl.add_constraint(y[j] <= ub * a[j])
             else:
                 mdl.add_constraint(A[j, :] @ x + b[j] == y[j])
-
+                # ub = ub + (ub - lb) * 0.1
+                # lb = lb - (ub - lb) * 0.1
                 output_bounds.append([lb, ub])
 
     return mdl, output_bounds
@@ -99,7 +105,7 @@ def get_types_and_bounds(dataframe, ignore_int=True, is_image=False):
                 'C' if ignore_int or np.any(unique_values.astype(np.int64) != unique_values.astype(np.float64)) else
                 'I')
             if is_image:
-                bounds.append((np.float64(0.0), np.float64(1.0)))
+                bounds.append((-0.1, 1.1))
             else:
                 bounds.append((dataframe[column].min(), dataframe[column].max()))
         return input_types, bounds

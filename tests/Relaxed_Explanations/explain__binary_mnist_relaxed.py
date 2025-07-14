@@ -6,7 +6,7 @@ import pandas as pd
 import torch
 from matplotlib import pyplot as plt
 
-from Datasets.mnist.mnist_dataset_utils import get_dataframe_mnist
+from Datasets.mnist.mnist_dataset_utils import get_dataframe_mnist_binary
 from src.relax_explainer.network.ForwardReLU import ForwardReLU
 from src.legacy.explication import get_miminal_explanation
 from src.relax_explainer.relaxed_codify_network import relaxed_codify_network, get_types_and_bounds
@@ -19,7 +19,7 @@ def plot_explanation(instance, explication):
     plt.title(f'Original')
     plt.axis('off')
     plt.show(block=False)
-    plt.pause(4)
+    plt.pause(2)
     # plt.close()
 
     image2 = explication.reshape(28, 28)
@@ -27,7 +27,7 @@ def plot_explanation(instance, explication):
     plt.title(f'Explicação:')
     plt.axis('off')
     plt.show(block=False)
-    plt.pause(4)
+    plt.pause(2)
     plt.close()
 
 def steps_to_fidelity(model, instance, inputs, prediction, domain):
@@ -91,10 +91,10 @@ def run(layers, relaxation, relaxes):
         layer_str += str(i) + "x"
     layer_str += str(layers[-1])
 
-    mnist_df = get_dataframe_mnist(target=False)
+    mnist_df = get_dataframe_mnist_binary(target=False)
 
     mnist_network = ForwardReLU(layers)
-    mnist_network.load_state_dict(torch.load(f'../../Networks/mnist/Weights/mnist_net{layer_str}_weights.pth',
+    mnist_network.load_state_dict(torch.load(f'../../Networks/mnist_bin/Weights/mnist_net{layer_str}_weights.pth',
                                              weights_only=True))
 
     mnist_network.eval()
@@ -117,16 +117,16 @@ def run(layers, relaxation, relaxes):
 
         prediction = mnist_network(torch.FloatTensor(instance).unsqueeze(0)).argmax(dim=1).item()
         start = perf_counter()
-        inputs = get_miminal_explanation(relaxed_model, instance, prediction, relaxed_bounds, 10)
+        inputs = get_miminal_explanation(relaxed_model, instance, prediction, relaxed_bounds, 2)
         times.append(perf_counter() - start)
         sizes.append(len(inputs))
-        # fid = test_fidelity(mnist_network, instance, inputs, prediction, domain)
-        # fidelities += fid
+        fid = test_fidelity(mnist_network, instance, inputs, prediction, domain)
+        fidelities += fid
         true_fidelity = steps_to_fidelity(mnist_network, instance, inputs, prediction, domain)
         print(f"Checkpoint Explicado {len(times)}: {perf_counter() - start} | Tamanho: {len(inputs)}"
               f" | Fidelidade Relativa {784 - true_fidelity}"
               f" | Devolvidas: {784 - (len(inputs) + true_fidelity)}")
-        fidelities += 784 - true_fidelity
+        # fidelities += 784 - true_fidelity
 
     fidelities = fidelities / len(sizes)
 
@@ -138,24 +138,24 @@ def run(layers, relaxation, relaxes):
     return times, sizes, fidelities
 
 def append_results(experiments):
-    df = pd.read_csv(f"../../Results/mnist.csv", index_col=0)
+    df = pd.read_csv(f"../../Results/mnist_bin.csv", index_col=0)
     experiments = pd.DataFrame(experiments)
     df = pd.concat([df, experiments], ignore_index=True)
     print(df)
-    df.to_csv(f"../../Results/mnist.csv")
+    df.to_csv(f"../../Results/mnist_bin.csv")
 
 if __name__ == '__main__':
 
-    list_layers = [[28 * 28, 16, 16, 10],
-                   [28 * 28, 32, 32, 10],
-                   [28 * 28, 16, 16, 16, 10],
-                   [28 * 28, 16, 16, 16, 16, 10]]
+    list_layers = [[28 * 28, 16, 16, 2],
+                   [28 * 28, 32, 32, 2],
+                   [28 * 28, 16, 16, 16, 2],
+                   [28 * 28, 16, 16, 16, 16, 2]]
 
 
     relaxations = [0, 2, 4, 8]
 
 
-    relaxes = random.sample(range(0, 10000), 100)
+    relaxes = random.sample(range(0, 2000), 100)
     # relaxes = [1333,1758, 2873, 2953, 3006, 3076, 3287, 3738, 3784, 4694, 4719]
     # relaxes.append(1333)
     # relaxes.append(402)
@@ -180,7 +180,7 @@ if __name__ == '__main__':
             print(f"Tempo: {time() - start}")
             print()
 
-            experiments["dataset"].append("mnsit")
+            experiments["dataset"].append("mnsit_bin")
             experiments["network"].append(net_str)
             experiments["relaxation"].append(relax)
             experiments["time_mean"].append(np.mean(times))
