@@ -114,7 +114,7 @@ class ForwardReluTrainer:
         plt.title("Gráfico das Losses de Treinamento e Teste")
         plt.savefig("figures/treino.png")
 
-    def eval(self):
+    def eval(self, verbose=1):
         self.model.eval()
         correct = 0
         total = 0
@@ -135,7 +135,8 @@ class ForwardReluTrainer:
 
         # Calcula a acurácia
         accuracy = correct / total
-        print(f'Acurácia no conjunto avaliado: {accuracy * 100:.2f}%')
+        if verbose:
+            print(f'Acurácia no conjunto avaliado: {accuracy * 100:.2f}%')
         self.confusion_matrix(predicteds)
         return accuracy
 

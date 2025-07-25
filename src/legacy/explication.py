@@ -29,12 +29,9 @@ def get_miminal_explanation(model, network_input, network_output, output_bounds,
     mdl.add_constraint(mdl.sum(binary_variables) >= 1)
     mdl = insert_output_constraints_tjeng(mdl, output_variables, network_output, binary_variables,
                                               output_bounds)
-    start = time.perf_counter()
     for i in range(len(network_input)):
         mdl.remove_constraint(input_constraints[i])
         mdl.solve(log_output=False)
         if mdl.solution is not None:
             mdl.add_constraint(input_constraints[i])
-        print(i, time.perf_counter() - start)
-        start=time.perf_counter()
     return mdl.find_matching_linear_constraints('input')

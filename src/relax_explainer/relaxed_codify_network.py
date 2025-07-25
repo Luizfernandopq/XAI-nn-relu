@@ -9,6 +9,9 @@ from cplex import infinity
 def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, decision_variables, output_variables):
     output_bounds = []
 
+    # mdl.parameters.timelimit = 2400
+    start = time.time()
+
     for i in range(len(layers)):
         A = layers[i].weight.detach().numpy()
         b = layers[i].bias.detach().numpy()
@@ -20,15 +23,23 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
             y = intermediate_variables[i]
         else:
             y = output_variables
-        start = time.perf_counter()
+
+        print()
         for j in range(A.shape[0]):
 
-            print(i, j, time.perf_counter() - start)
-            start = time.perf_counter()
+            checkp = time.time()
+            if checkp - start > 1000:
+                print(f"Layer {i} N {j-1}: {checkp-start}")
+            else:
+                print(f" N{j-1}", end=" ")
+            start = time.time()
+
             mdl.maximize(A[j, :] @ x + b[j])
             mdl.solve()
             ub = mdl.solution.get_objective_value()
             mdl.remove_objective()
+
+
 
             if ub <= 0 and i != len(layers) - 1:
                 mdl.add_constraint(y[j] == 0, ctname=f'c_{i}_{j}')
@@ -86,7 +97,7 @@ def relaxed_codify_network(network, dataframe, relax_quatity=0, is_image=False):
     if relax_quatity > 0:
         for binary_vars in decision_variables:
             relaxes = random.sample(range(0, len(binary_vars)), relax_quatity)
-
+            print(f"Neuron Relaxed: {relaxes}")
             for index in relaxes:
                 binary_vars[index].set_vartype("Continuous")
 
