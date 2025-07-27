@@ -47,16 +47,16 @@ def train_network(dataset_name):
     print(dataset_name)
     param_grid = {
         "lr": [1e-2, 1e-3, 1e-4, 1e-5],
-        "weight_decay": [0.0, 1e-4, 1e-5],
-        "betas": [(0.9, 0.999), (0.85, 0.995), (0.85, 0.999), (0.8, 0.99)]
+        "weight_decay": [0.0, 1e-3, 1e-4, 1e-5],
+        "betas": [(0.9, 0.999), (0.85, 0.995), (0.85, 0.999), (0.8, 0.99), (0.9, 0.999)]
     }
     list_layers = [#[10, 16, 16, 2],
                    # [10, 32, 32, 2],
                    # [10, 48, 48, 2],
-                   [10, 16, 16, 16, 2],
+                   # [10, 16, 16, 16, 2],
                    # [10, 32, 32, 32, 2],
                    # [10, 48, 48, 48, 2],
-                   # [10, 16, 16, 16, 16, 2],
+                   [10, 16, 16, 16, 16, 2],
                    # [10, 32, 32, 32, 32, 2],
                    ]#[10, 48, 48, 48, 48, 2]]
 
@@ -74,12 +74,12 @@ def train_network(dataset_name):
             hparams = dict(zip(param_grid.keys(), param_set))
             acc = run(layer, train, test, dataset_name, hparams)
 
-            # print(f"{layer} Acurácia: {acc:.4f} - Hparams: {hparams}")
+            print(f"{layer} Acurácia: {acc:.4f} - Hparams: {hparams}")
             # print(time.time() - start, "\n")
             if acc > best_acc:
                 best_acc = acc
                 best_params = hparams
-            if acc > 0.82:
+            if acc > 0.79:
                 break
 
         print("\nMelhor acurácia:", best_acc)

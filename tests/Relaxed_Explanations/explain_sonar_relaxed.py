@@ -66,7 +66,7 @@ def run(layers, relax):
     sizes = []
     fidelities = 0
 
-    relaxed_model.parameters.timelimit = 600
+    relaxed_model.parameters.timelimit = 300
 
     for index, instance in df.iterrows():
 

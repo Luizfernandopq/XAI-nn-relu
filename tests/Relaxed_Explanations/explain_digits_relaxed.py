@@ -90,6 +90,8 @@ def run(layers, relax, samples):
     start1 = time()
     relaxed_model, relaxed_bounds = relaxed_codify_network(network, df, relax_quatity=relax)
 
+    relaxed_model.parameters.timelimit = 300
+
     print(f"Explicação iniciada após: {time() - start1}")
     _, domain = get_types_and_bounds(df)
 
@@ -121,7 +123,13 @@ def run(layers, relax, samples):
     mediana = np.median(sizes)
     maximo = np.max(sizes)
     minimo = np.min(sizes)
-    print(f"Tamanho -> Média: {media}, Mediana: {mediana}, Máximo: {maximo}, Mínimo: {minimo}")
+    print(f"EXPLICAÇÃO -> Média: {media}, Mediana: {mediana}, Máximo: {maximo}, Mínimo: {minimo}")
+    media = np.mean(times)
+    mediana = np.median(times)
+    maximo = np.max(times)
+    minimo = np.min(times)
+    print(f"TEMPO -> Média: {media}, Mediana: {mediana}, Máximo: {maximo}, Mínimo: {minimo}")
+
     print(f"Fidelidade: {fidelities}")
     return times, sizes, fidelities
 
@@ -139,15 +147,16 @@ if __name__ == '__main__':
         # [64, 48, 48, 10],
         # [64, 16, 16, 16, 10],
         # [64, 32, 32, 32, 10],
-        [64, 48, 48, 48, 10],
+        #[64, 48, 48, 48, 10],
         # [64, 16, 16, 16, 16, 10],
         [64, 32, 32, 32, 32, 10],
-        [64, 48, 48, 48, 48, 10]]
+        ]#[64, 48, 48, 48, 48, 10]]
 
     relaxations = [0, 2, 4, 8]
 
-    samples = random.sample(range(0, 1797), 100)
-    # relaxes = [7, 12, 45, 67, 75, 98, 131, 143, 167, 174, 187, 205, 213, 229, 231, 256, 257, 260, 284, 297, 306, 311, 346, 358, 362, 388, 419, 427, 431, 443, 445, 450, 451, 457, 458, 467, 468, 474, 485, 486, 500, 507, 511, 517, 519, 543, 564, 566, 567, 578, 589, 600, 613, 614, 620, 626, 644, 648, 662, 666, 682, 691, 692, 700, 719, 725, 731, 737, 748, 779, 797, 804, 806, 817, 829, 834, 837, 838, 844, 846, 849, 865, 867, 894, 922, 925, 936, 944, 950, 958, 959, 962, 964, 966, 972, 981, 1023, 1025, 1027, 1044, 1047, 1056, 1061, 1063, 1069, 1075, 1082, 1095, 1108, 1117, 1139, 1156, 1161, 1179, 1182, 1199, 1210, 1212, 1218, 1223, 1233, 1240, 1242, 1245, 1246, 1259, 1264, 1268, 1313, 1315, 1326, 1337, 1340, 1347, 1357, 1362, 1364, 1365, 1370, 1373, 1392, 1396, 1397, 1404, 1411, 1413, 1419, 1424, 1438, 1444, 1457, 1464, 1481, 1487, 1497, 1520, 1523, 1552, 1564, 1580, 1587, 1596, 1600, 1606, 1612, 1613, 1627, 1631, 1651, 1653, 1659, 1662, 1684, 1730, 1745, 1749, 1754, 1756, 1762, 1771]
+    # samples = random.sample(range(0, 1797), 100)
+    samples = [10, 14, 25, 47, 51, 63, 68, 102, 108, 109, 116, 126, 149, 173, 227, 228, 255, 260, 264, 302, 320, 340, 346, 355, 389, 394, 453, 455, 469, 471, 494, 506, 540, 547, 548, 559, 568, 578, 588, 592, 601, 611, 617, 627, 637, 644, 656, 673, 679, 740, 751, 800, 831, 854, 857, 885, 892, 914, 940, 945, 970, 1017, 1048, 1086, 1101, 1152, 1180, 1188, 1246, 1247, 1294, 1316, 1338, 1343, 1381, 1385, 1418, 1439, 1441, 1447, 1521, 1532, 1547, 1550, 1576, 1579, 1591, 1598, 1660, 1661, 1674, 1685, 1690, 1737, 1739, 1762, 1765, 1790, 1792, 1794]
+
     # relaxes = relaxes[70:72]
     print(sorted(samples))
     for layers in list_layers:
@@ -179,6 +188,6 @@ if __name__ == '__main__':
             experiments["expl_size_std"].append(np.std(sizes))
             experiments["fidelity"].append(fidelitie)
 
-        # append_results(experiments)
+        append_results(experiments)
     # print(experiments)
     # experiments.to_csv(f"../../Results/digits.csv")

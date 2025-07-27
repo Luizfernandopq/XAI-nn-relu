@@ -48,6 +48,7 @@ def run(layers, relax, dataset_name, df, samples):
 
     start1 = time()
     relaxed_model, relaxed_bounds = relaxed_codify_network(network, df, relax_quatity=relax)
+    relaxed_model.parameters.timelimit = 300
 
     print(f"Explicação iniciada após: {time() - start1}")
     _, domain = get_types_and_bounds(df)
@@ -56,7 +57,7 @@ def run(layers, relax, dataset_name, df, samples):
     sizes = []
     fidelities = 0
 
-    relaxed_model.parameters.timelimit = 600
+    relaxed_model.parameters.timelimit = 300
 
     for index, instance in df.iterrows():
         if index not in samples:
@@ -67,8 +68,8 @@ def run(layers, relax, dataset_name, df, samples):
         inputs = get_miminal_explanation(relaxed_model, instance, prediction, relaxed_bounds, layers[-1])
         times.append(perf_counter() - start)
         sizes.append(len(inputs))
-        if index % 10 == 0:
-            print(f"Explicado {index}: {perf_counter() - start}")
+        if len(times) % 5 == 0:
+            print(f"Explicado {len(times)}: {perf_counter() - start}")
 
         fidelities += test_fidelity(network, instance, inputs, prediction, domain)
 
@@ -98,15 +99,15 @@ def append_results(experiments, dataset_name):
     df.reset_index(drop=True).to_csv(f"../../Results/{dataset_name}.csv")
 
 def explain(dataset_name):
-    list_layers = [[60, 16, 16, 2],
-                   [60, 32, 32, 2],
-                   [60, 48, 48, 2],
-                   [60, 16, 16, 16, 2],
-                   [60, 32, 32, 32, 2],
-                   [60, 48, 48, 48, 2],
+    list_layers = [#[60, 16, 16, 2],
+                   # [60, 32, 32, 2],
+                   # [60, 48, 48, 2],
+                   # [60, 16, 16, 16, 2],
+                   # [60, 32, 32, 32, 2],
+                   # [60, 48, 48, 48, 2],
                    [60, 16, 16, 16, 16, 2],
-                   [60, 32, 32, 32, 32, 2],
-                   [60, 48, 48, 48, 48, 2]]
+                   # [60, 32, 32, 32, 32, 2],
+                   ]#[60, 48, 48, 48, 48, 2]]
 
     relaxations = [0, 2, 4, 8]
 
@@ -116,7 +117,7 @@ def explain(dataset_name):
     heart = [4, 5, 6, 9, 11, 14, 16, 18, 19, 20, 21, 22, 23, 24, 31, 32, 35, 36, 37, 38, 50, 51, 52, 55, 56, 57, 58, 60, 61, 62, 63, 66, 67, 70, 71, 73, 74, 78, 80, 84, 90, 95, 96, 98, 100, 106, 113, 116, 118, 120, 121, 122, 128, 129, 130, 135, 136, 139, 140, 144, 148, 149, 151, 155, 156, 157, 170, 171, 174, 177, 184, 185, 186, 190, 199, 200, 201, 207, 208, 212, 216, 217, 218, 221, 222, 224, 232, 234, 236, 237, 239, 240, 245, 248, 251, 256, 259, 266, 267, 268]
 
     samples = random.sample(range(0, len(df)), 100)
-    print(sorted(samples))
+    print(len(samples), sorted(samples))
     for layers in list_layers:
         layers[0] = train_set.X.shape[1]
         layers[-1] = torch.max(train_set.y).item() + 1
@@ -153,8 +154,8 @@ def explain(dataset_name):
 
 if __name__ == '__main__':
     nets = ["diabetes", "glass", "heart-statlog"]
+    nets.pop(2)
     nets.pop(0)
-    # nets.pop(0)
     for net in nets:
         print(net)
         explain(net)

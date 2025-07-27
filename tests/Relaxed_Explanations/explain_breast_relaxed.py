@@ -1,3 +1,4 @@
+import random
 from time import time, perf_counter
 
 import numpy as np
@@ -13,31 +14,22 @@ from src.relax_explainer.relaxed_codify_network import relaxed_codify_network, g
 
 def test_fidelity(model, instance, inputs, prediction, domain):
     indexes = []
-    explication = np.zeros(30, dtype=np.float32)
 
     for j in inputs:
         index_input = int(j.name.split("input")[1]) - 1
         indexes.append(index_input)
-        explication[index_input] = 1.0
-
-    # plot_explanation(instance.to_numpy(), explication)
 
     for i in range(len(instance)):
         if i not in indexes:
             lb, ub = domain[i]
             instance[i] = np.random.uniform(lb, ub)
-
     instance = torch.FloatTensor(instance)
-    # print("OLD: ", prediction, end="\t|\t")
-    # print("New: ", model(instance.unsqueeze(0)).argmax(dim=1).item(), end=" -> ")
-    # plot_explanation(instance.numpy(), explication)
-
     if model(instance.unsqueeze(0)).argmax(dim=1).item() == prediction:
         return 1
     return 0
 
 
-def run(layers, relax):
+def run(layers, relax, samples):
 
     layer_str = "_"
     for i in layers[:-1]:
@@ -55,10 +47,11 @@ def run(layers, relax):
     breast_cancer_network.eval()
     all_set = train_set.eat_other(test_set)
     df = all_set.to_dataframe(target=False)
-
     start1 = time()
     relaxed_model, relaxed_bounds = relaxed_codify_network(breast_cancer_network, df, relax_quatity=relax)
     _, domain = get_types_and_bounds(df)
+
+    relaxed_model.parameters.timelimit = 300
 
     print(f"Explicação iniciada após: {time() - start1}")
 
@@ -66,11 +59,8 @@ def run(layers, relax):
     sizes = []
     fidelities = 0
 
-
-
     for index, instance in df.iterrows():
-
-        if index % 4 != 0:
+        if index not in samples:
             continue
 
         prediction = breast_cancer_network(torch.FloatTensor(instance).unsqueeze(0)).argmax(dim=1).item()
@@ -79,9 +69,9 @@ def run(layers, relax):
         inputs = get_miminal_explanation(relaxed_model, instance, prediction, relaxed_bounds, 2)
         times.append(perf_counter() - start)
         sizes.append(len(inputs))
-        if index % 50 == 0:
-            print(f"Explicado {index}: {perf_counter() - start}")
-
+        if len(times) % 20 == 0:
+            print(f"Checkpoint Explicado {len(times)}: {perf_counter() - start} | média: {np.mean(times)} | "
+                  f"Fidelidade {fidelities / len(times)}")
         fidelities += test_fidelity(breast_cancer_network, instance, inputs, prediction, domain)
 
     fidelities = fidelities/len(sizes)
@@ -116,10 +106,12 @@ if __name__ == '__main__':
                    # [30, 48, 48, 48, 2],
                    # [30, 16, 16, 16, 16, 2],
                    [30, 32, 32, 32, 32, 2],
-                   [30, 48, 48, 48, 48, 2]]
+                   ]#[30, 48, 48, 48, 48, 2]]
+
+    samples = random.sample(range(0, 569), 100)
 
     relaxations = [0, 2, 4, 8]
-
+    print(sorted(samples))
     for layers in list_layers:
         experiments = {
             "dataset": [],
@@ -137,7 +129,7 @@ if __name__ == '__main__':
 
             print(f"Rodando: {net_str} relax: {relax}")
             start = time()
-            times, sizes, fidelitie = run(layers, relax)
+            times, sizes, fidelitie = run(layers, relax, samples)
             print(f"Tempo: {time() - start}")
             experiments["dataset"].append("breast_cancer")
             experiments["network"].append(net_str)
