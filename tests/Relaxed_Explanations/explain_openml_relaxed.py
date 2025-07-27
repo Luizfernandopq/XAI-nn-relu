@@ -99,14 +99,14 @@ def append_results(experiments, dataset_name):
     df.reset_index(drop=True).to_csv(f"../../Results/{dataset_name}.csv")
 
 def explain(dataset_name):
-    list_layers = [#[60, 16, 16, 2],
-                   # [60, 32, 32, 2],
+    list_layers = [[60, 16, 16, 2],
+                   [60, 32, 32, 2],
                    # [60, 48, 48, 2],
-                   # [60, 16, 16, 16, 2],
-                   # [60, 32, 32, 32, 2],
+                   [60, 16, 16, 16, 2],
+                   [60, 32, 32, 32, 2],
                    # [60, 48, 48, 48, 2],
                    [60, 16, 16, 16, 16, 2],
-                   # [60, 32, 32, 32, 32, 2],
+                   [60, 32, 32, 32, 32, 2],
                    ]#[60, 48, 48, 48, 48, 2]]
 
     relaxations = [0, 2, 4, 8]
@@ -153,9 +153,11 @@ def explain(dataset_name):
 
 
 if __name__ == '__main__':
-    nets = ["diabetes", "glass", "heart-statlog"]
-    nets.pop(2)
+    nets = ["diabetes", "glass", "heart-statlog", "iris"]
     nets.pop(0)
+    nets.pop(0)
+    nets.pop(0)
+
     for net in nets:
         print(net)
         explain(net)

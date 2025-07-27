@@ -35,7 +35,7 @@ def run(layers, train_set, test_set, dataset_name, hparams, epochs=820, best=0):
     acc = trainer.eval(verbose=0)
     if best < acc:
         best = acc
-    if acc > 0.79:
+    if acc > 0.95:
         torch.save(network.state_dict(), f'../../../Networks/{dataset_name}/{dataset_name}_net{layer_str}_weights.pth')
         return acc
     if epochs == 20:
@@ -50,15 +50,15 @@ def train_network(dataset_name):
         "weight_decay": [0.0, 1e-3, 1e-4, 1e-5],
         "betas": [(0.9, 0.999), (0.85, 0.995), (0.85, 0.999), (0.8, 0.99), (0.9, 0.999)]
     }
-    list_layers = [#[10, 16, 16, 2],
-                   # [10, 32, 32, 2],
+    list_layers = [[10, 16, 16, 2],
+                   [10, 32, 32, 2],
                    # [10, 48, 48, 2],
-                   # [10, 16, 16, 16, 2],
-                   # [10, 32, 32, 32, 2],
+                   [10, 16, 16, 16, 2],
+                   [10, 32, 32, 32, 2],
                    # [10, 48, 48, 48, 2],
                    [10, 16, 16, 16, 16, 2],
-                   # [10, 32, 32, 32, 32, 2],
-                   ]#[10, 48, 48, 48, 48, 2]]
+                   [10, 32, 32, 32, 32, 2]]
+                   # [10, 48, 48, 48, 48, 2]]
 
     train, test = get_dataset_openml(dataset_name)
 
@@ -79,7 +79,7 @@ def train_network(dataset_name):
             if acc > best_acc:
                 best_acc = acc
                 best_params = hparams
-            if acc > 0.79:
+            if acc > 0.95:
                 break
 
         print("\nMelhor acurácia:", best_acc)
@@ -88,8 +88,9 @@ def train_network(dataset_name):
 
 
 if __name__ == '__main__':
-    nets = ["diabetes", "glass", "heart-statlog"]
-    nets.pop(2)
+    nets = ["diabetes", "glass", "heart-statlog", "iris"]
+    nets.pop(0)
+    nets.pop(0)
     nets.pop(0)
     for net in nets:
         train_network(net)

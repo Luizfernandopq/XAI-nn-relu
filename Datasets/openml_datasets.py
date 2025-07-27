@@ -11,6 +11,7 @@ def get_dataset_openml(name: str, test_size=0.20, random_state=42):
         "diabetes": 37,
         "glass": 41,
         "heart-statlog": 53,
+        "iris": 61
     }
 
     if name not in openml_ids:
