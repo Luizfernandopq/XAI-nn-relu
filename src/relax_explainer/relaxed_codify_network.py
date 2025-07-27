@@ -10,7 +10,6 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
     output_bounds = []
 
     # mdl.parameters.timelimit = 2400
-    start = time.time()
 
     for i in range(len(layers)):
         A = layers[i].weight.detach().numpy()
@@ -24,15 +23,7 @@ def codify_network_tjeng(mdl, layers, input_variables, intermediate_variables, d
         else:
             y = output_variables
 
-        print()
         for j in range(A.shape[0]):
-
-            checkp = time.time()
-            if checkp - start > 1000:
-                print(f"Layer {i} N {j-1}: {checkp-start}")
-            else:
-                print(f" N{j-1}", end=" ")
-            start = time.time()
 
             mdl.maximize(A[j, :] @ x + b[j])
             mdl.solve()
